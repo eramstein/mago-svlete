@@ -3,11 +3,10 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:svelte/recommended",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "svelte"],
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 2020,
@@ -31,8 +30,6 @@
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "no-console": ["warn", { "allow": ["warn", "error"] }],
-    "svelte/valid-compile": "warn",
-    "svelte/no-at-html-tags": "warn"
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
   }
-} 
+}

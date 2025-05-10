@@ -1,14 +1,17 @@
-import type { GameState } from './model';
+import type { BattleState } from './model';
 
-export const state: GameState = $state({
+export const state: BattleState = $state({
   players: [
+    {
+      id: 0,
+      name: 'Player 0',
+      hand: [],
+    },
     {
       id: 1,
       name: 'Player 1',
-    },
-    {
-      id: 2,
-      name: 'Player 2',
+      hand: [],
     },
   ],
+  deployedCards: [],
 });
