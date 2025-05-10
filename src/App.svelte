@@ -1,13 +1,13 @@
 <script lang="ts">
   import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/ui/Counter.svelte'
+  import Battle from './lib/ui/Battle.svelte'
 </script>
 
 <main>
   
   <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
 
-  <Counter />
+  <Battle />
 
 </main>
 
