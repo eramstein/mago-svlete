@@ -2,6 +2,8 @@
   import type { Player } from '../state/model';
   import { config } from '../config';
   import { state } from '../state/state.svelte';
+  import { send, receive } from './transitions/crossfade';
+
   let { player }: { player: Player } = $props();
 </script>
 
@@ -12,7 +14,7 @@
       <p>No cards in hand</p>
     {:else}
       <div class="cards">
-        {#each player.hand as card}
+        {#each player.hand as card (card.instanceId)}
           <div
             class="card"
             draggable={state.activePlayerId === player.id}
@@ -21,6 +23,8 @@
             ondragstart={(e) => {
               e.dataTransfer?.setData('text/plain', JSON.stringify(card));
             }}
+            in:receive={{ key: card.instanceId }}
+            out:send={{ key: card.instanceId }}
           >
             <span>{card.name}</span>
           </div>

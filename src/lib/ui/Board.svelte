@@ -2,6 +2,7 @@
   import { config } from '../config';
   import { deployCard } from '../logic/card';
   import { state } from '../state/state.svelte';
+  import { send, receive } from './transitions/crossfade';
 
   function handleDrop(e: DragEvent, row: number, col: number) {
     e.preventDefault();
@@ -31,13 +32,15 @@
       </div>
     {/each}
   {/each}
-  {#each state.deployedCards as card}
+  {#each state.deployedCards as card (card.instanceId)}
     <div
       class="deployed-card"
       style="
         left: calc({card.position.x} * (var(--cell-size) + 2px) + 2px);
         top: calc({card.position.y} * (var(--cell-size) + 2px) + 2px);
       "
+      in:receive={{ key: card.instanceId }}
+      out:send={{ key: card.instanceId }}
     >
       <span>{card.name}</span>
     </div>
