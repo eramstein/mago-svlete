@@ -4,6 +4,7 @@ import type { BattleState } from './model';
 export const initialState: BattleState = {
   turn: 1,
   activePlayerId: 0,
+  wonByPlayerId: null,
   players: [
     {
       id: 0,
@@ -44,4 +45,27 @@ export const initializeBoard = (state: BattleState): BattleState => {
     }))
   );
   return state;
+};
+
+export const saveStateToLocalStorage = (): void => {
+  try {
+    localStorage.setItem('battleState', JSON.stringify(state));
+  } catch (error) {
+    console.error('Failed to save state to localStorage:', error);
+  }
+};
+
+export const loadStateFromLocalStorage = (): BattleState | null => {
+  try {
+    const savedState = localStorage.getItem('battleState');
+    if (!savedState) return null;
+
+    const parsedState = JSON.parse(savedState);
+    // Update the current state with the loaded data
+    Object.assign(state, parsedState);
+    return state;
+  } catch (error) {
+    console.error('Failed to load state from localStorage:', error);
+    return null;
+  }
 };

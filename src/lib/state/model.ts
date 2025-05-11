@@ -3,6 +3,7 @@ import type { Direction } from './enums';
 export type BattleState = {
   turn: number;
   activePlayerId: number;
+  wonByPlayerId: number | null;
   players: Player[];
   deployedCards: DeployedCard[];
   board: Cell[][];
