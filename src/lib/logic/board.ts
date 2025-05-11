@@ -50,13 +50,13 @@ export function computeBoardControlStatus(state: BattleState) {
     for (let i = 1; i <= (distance || config.boardSize); i++) {
       const cell = controlMap[getCellString(position.x - i, position.y)];
       if (!cell || occupiedPositions[getCellString(position.x - i, position.y)]) break;
-      cell[card.ownerId] = strength || 1;
+      cell[card.ownerId] += strength || 1;
     }
     // fill to right
     for (let i = 1; i <= (distance || config.boardSize); i++) {
       const cell = controlMap[getCellString(position.x + i, position.y)];
       if (!cell || occupiedPositions[getCellString(position.x + i, position.y)]) break;
-      cell[card.ownerId] = strength || 1;
+      cell[card.ownerId] += strength || 1;
     }
   };
 
@@ -67,13 +67,13 @@ export function computeBoardControlStatus(state: BattleState) {
     for (let i = 1; i <= (distance || config.boardSize); i++) {
       const cell = controlMap[getCellString(position.x, position.y - i)];
       if (!cell || occupiedPositions[getCellString(position.x, position.y - i)]) break;
-      cell[card.ownerId] = strength || 1;
+      cell[card.ownerId] += strength || 1;
     }
     // fill to bottom
     for (let i = 1; i <= (distance || config.boardSize); i++) {
       const cell = controlMap[getCellString(position.x, position.y + i)];
       if (!cell || occupiedPositions[getCellString(position.x, position.y + i)]) break;
-      cell[card.ownerId] = strength || 1;
+      cell[card.ownerId] += strength || 1;
     }
   };
 

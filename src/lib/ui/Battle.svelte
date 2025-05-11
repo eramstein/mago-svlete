@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { resetState, state } from '../state/state.svelte';
+  import { resetState, gs } from '../state/state.svelte';
+  import { initBattle } from '../logic/battle';
+  import { uiState } from '../state/state-ui.svelte';
+
+  import CardInfo from './CardInfo.svelte';
   import Player from './Player.svelte';
   import Board from './Board.svelte';
-  import { initBattle } from '../logic/battle';
 
   function playAgain() {
     resetState();
@@ -12,21 +15,24 @@
 
 <div class="battle-container">
   <div class="player-container left">
-    <Player player={state.players[0]} />
+    <Player player={gs.players[0]} />
   </div>
   <div class="board-container">
     <div class="turn">
-      Turn {state.turn}
+      Turn {gs.turn}
     </div>
     <Board />
   </div>
-  <div class="player-container right">
-    <Player player={state.players[1]} />
+  <div class="right">
+    {#if uiState.selectedCard}
+      <CardInfo card={uiState.selectedCard} />
+    {/if}
   </div>
-  {#if state.wonByPlayerId !== null}
+  {#if gs.wonByPlayerId !== null}
     <div class="winner-container">
       <h1>Winner</h1>
-      <p>{state.players[state.wonByPlayerId].name} wins!</p>
+      <p>{gs.players[gs.wonByPlayerId].name} wins!</p>
+      <hr />
       <button on:click={() => playAgain()}>Play again</button>
     </div>
   {/if}

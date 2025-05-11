@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { Player } from '../state/model';
   import { config } from '../config';
-  import { state } from '../state/state.svelte';
+  import { gs } from '../state/state.svelte';
   import { send, receive } from './transitions/crossfade';
   import { flip } from 'svelte/animate';
-
+  import { uiState } from '../state/state-ui.svelte';
   let { player }: { player: Player } = $props();
 </script>
 
@@ -18,15 +18,14 @@
         {#each player.hand as card (card.instanceId)}
           <div
             class="card"
-            draggable={state.activePlayerId === player.id}
-            role="button"
-            tabindex="0"
-            ondragstart={(e) => {
-              e.dataTransfer?.setData('text/plain', JSON.stringify(card));
-            }}
+            draggable={gs.activePlayerId === player.id}
+            ondragstart={() => (uiState.draggedCard = card)}
             in:receive={{ key: card.instanceId }}
             out:send={{ key: card.instanceId }}
             animate:flip={{ duration: 200 }}
+            onclick={() => {
+              uiState.selectedCard = card;
+            }}
           >
             <span>{card.name}</span>
           </div>

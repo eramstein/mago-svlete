@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { config } from '../config';
-  import { deployCard } from '../logic/card';
-  import { state } from '../state/state.svelte';
   import { send, receive } from './transitions/crossfade';
+
+  import { config } from '../config';
+  import { deployCard, getCellString } from '../logic';
+  import { gs, uiState } from '../state';
+  import { getImpactedCellsPreview } from './helpers';
+
   import cardDeploySound from '../../assets/sounds/card-deploy.mp3';
 
   const deploySound = new Audio(cardDeploySound);
-  let previousDeployedCardsLength = state.deployedCards.length;
+  let previousDeployedCardsLength = gs.deployedCards.length;
+  let dragOverCell: { row: number; col: number } | null = $state(null);
+  let impactedCellsPreview: Record<string, boolean> = $state({});
 
   function playDeploySound() {
     deploySound.currentTime = 0;
@@ -14,49 +19,71 @@
   }
 
   $effect(() => {
-    if (state.deployedCards.length > previousDeployedCardsLength) {
+    if (gs.deployedCards.length > previousDeployedCardsLength) {
       playDeploySound();
     }
-    previousDeployedCardsLength = state.deployedCards.length;
+    previousDeployedCardsLength = gs.deployedCards.length;
   });
 
   function handleDrop(e: DragEvent, row: number, col: number) {
     e.preventDefault();
-    const cardData = e.dataTransfer?.getData('text/plain');
-    if (cardData) {
-      const card = JSON.parse(cardData);
-      deployCard(state, card, { x: col, y: row });
+    dragOverCell = null;
+    if (uiState.draggedCard) {
+      deployCard(gs, uiState.draggedCard, { x: col, y: row });
     }
+    uiState.draggedCard = null;
+    impactedCellsPreview = {};
   }
 
   function handleDragOver(e: DragEvent) {
     e.preventDefault();
   }
+
+  function handleDragEnter(e: DragEvent, row: number, col: number) {
+    e.preventDefault();
+    dragOverCell = { row, col };
+    if (uiState.draggedCard?.control) {
+      impactedCellsPreview = getImpactedCellsPreview(uiState.draggedCard.control, {
+        x: col,
+        y: row,
+      });
+    }
+  }
+
+  function handleDragLeave(e: DragEvent) {
+    e.preventDefault();
+    dragOverCell = null;
+    impactedCellsPreview = {};
+  }
 </script>
 
 <div class="board" style="--board-size: {config.boardSize}; --cell-size: {config.cellSize}px">
-  {#each Array(state.board.length) as _, row}
-    {#each Array(state.board[row].length) as _, col}
+  {#each Array(gs.board.length) as _, row}
+    {#each Array(gs.board[row].length) as _, col}
       <div
         class="cell"
-        class:player0-control={state.board[col][row].controlStatus?.playerId === 0}
-        class:player1-control={state.board[col][row].controlStatus?.playerId === 1}
-        style="--control-strength: {state.board[col][row].controlStatus?.strength || 0}"
+        class:player0-control={gs.board[col][row].controlStatus?.playerId === 0}
+        class:player1-control={gs.board[col][row].controlStatus?.playerId === 1}
+        class:drag-over={dragOverCell?.row === row && dragOverCell?.col === col}
+        class:impacted={impactedCellsPreview[getCellString(col, row)]}
+        style="--control-strength: {gs.board[col][row].controlStatus?.strength || 0}"
         role="button"
         tabindex="0"
         ondrop={(e) => handleDrop(e, row, col)}
         ondragover={handleDragOver}
-      >
-        {row} - {col}
-      </div>
+        ondragenter={(e) => handleDragEnter(e, row, col)}
+        ondragleave={handleDragLeave}
+      ></div>
     {/each}
   {/each}
-  {#each state.deployedCards as card (card.instanceId)}
+  {#each gs.deployedCards as card (card.instanceId)}
     <div
       class="deployed-card"
+      class:player0-control={card.ownerId === 0}
+      class:player1-control={card.ownerId === 1}
       style="
-        left: calc({card.position.x} * (var(--cell-size) + 2px) + 2px);
-        top: calc({card.position.y} * (var(--cell-size) + 2px) + 2px);
+        left: calc({card.position.x} * (var(--cell-size) + 2px) + 1px);
+        top: calc({card.position.y} * (var(--cell-size) + 2px) + 1px);
       "
       in:receive={{ key: card.instanceId }}
       out:send={{ key: card.instanceId }}
@@ -89,12 +116,20 @@
     transition: background-color 0.3s ease;
   }
 
-  .player0-control {
+  .cell.player0-control {
     background-color: rgba(0, 0, 255, calc(var(--control-strength) * 0.2));
   }
 
-  .player1-control {
+  .cell.player1-control {
     background-color: rgba(255, 0, 0, calc(var(--control-strength) * 0.2));
+  }
+
+  .deployed-card.player0-control {
+    border-color: rgba(0, 0, 255);
+  }
+
+  .deployed-card.player1-control {
+    border-color: rgba(255, 0, 0);
   }
 
   .deployed-card {
@@ -103,7 +138,7 @@
     height: calc(var(--cell-size) - 6px);
     background-color: #333;
     color: white;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -115,5 +150,14 @@
   .deployed-card span {
     font-size: 0.8rem;
     word-break: break-word;
+  }
+
+  .cell.drag-over {
+    background-color: rgba(35, 49, 213, 0.3);
+    box-shadow: inset 0 0 0 2px rgba(35, 49, 213, 0.5);
+  }
+
+  .cell.impacted {
+    box-shadow: inset 0 0 0 2px rgb(35, 49, 213, 0.5);
   }
 </style>

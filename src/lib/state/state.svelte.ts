@@ -21,19 +21,19 @@ export const initialState: BattleState = {
   board: [],
 };
 
-export const state: BattleState = $state(initialState);
+export const gs: BattleState = $state(initialState);
 
 export const resetState = (): BattleState => {
   (Object.keys(initialState) as Array<keyof BattleState>).forEach((key) => {
     const value = initialState[key];
     if (Array.isArray(value)) {
-      (state[key] as any) = [...value];
+      (gs[key] as any) = [...value];
     } else {
-      (state[key] as any) = value;
+      (gs[key] as any) = value;
     }
   });
-  initializeBoard(state);
-  return state;
+  initializeBoard(gs);
+  return gs;
 };
 
 export const initializeBoard = (state: BattleState): BattleState => {
@@ -49,7 +49,7 @@ export const initializeBoard = (state: BattleState): BattleState => {
 
 export const saveStateToLocalStorage = (): void => {
   try {
-    localStorage.setItem('battleState', JSON.stringify(state));
+    localStorage.setItem('battleState', JSON.stringify(gs));
   } catch (error) {
     console.error('Failed to save state to localStorage:', error);
   }
@@ -62,8 +62,8 @@ export const loadStateFromLocalStorage = (): BattleState | null => {
 
     const parsedState = JSON.parse(savedState);
     // Update the current state with the loaded data
-    Object.assign(state, parsedState);
-    return state;
+    Object.assign(gs, parsedState);
+    return gs;
   } catch (error) {
     console.error('Failed to load state from localStorage:', error);
     return null;
