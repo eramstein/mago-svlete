@@ -1,6 +1,6 @@
 import type { BattleState, Card, CardTemplate, Position } from '../state/model';
 import { passTurn } from './turn';
-import { isCellOccupied } from './board';
+import { computeBoardControlStatus, isCellOccupied } from './board';
 
 export function drawCard(state: BattleState, playerId: number, cardTemplate: CardTemplate) {
   const card = { ...cardTemplate, instanceId: crypto.randomUUID(), ownerId: playerId };
@@ -13,8 +13,10 @@ export function deployCard(state: BattleState, card: Card, position: Position) {
     return;
   }
   state.deployedCards.push({ ...card, position });
+  state.board[position.x][position.y].occupied = true;
   state.players[card.ownerId].hand = state.players[card.ownerId].hand.filter(
     (c) => c.instanceId !== card.instanceId
   );
+  computeBoardControlStatus(state);
   passTurn(state);
 }

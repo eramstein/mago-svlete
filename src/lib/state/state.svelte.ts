@@ -1,3 +1,4 @@
+import { config } from '../config';
 import type { BattleState } from './model';
 
 export const initialState: BattleState = {
@@ -16,6 +17,7 @@ export const initialState: BattleState = {
     },
   ],
   deployedCards: [],
+  board: [],
 };
 
 export const state: BattleState = $state(initialState);
@@ -29,5 +31,17 @@ export const resetState = (): BattleState => {
       (state[key] as any) = value;
     }
   });
+  initializeBoard(state);
+  return state;
+};
+
+export const initializeBoard = (state: BattleState): BattleState => {
+  state.board = Array.from({ length: config.boardSize }, (_, x) =>
+    Array.from({ length: config.boardSize }, (_, y) => ({
+      position: { x, y },
+      controlStatus: null,
+      occupied: false,
+    }))
+  );
   return state;
 };

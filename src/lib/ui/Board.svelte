@@ -35,10 +35,13 @@
 </script>
 
 <div class="board" style="--board-size: {config.boardSize}; --cell-size: {config.cellSize}px">
-  {#each Array(config.boardSize) as _, row}
-    {#each Array(config.boardSize) as _, col}
+  {#each Array(state.board.length) as _, row}
+    {#each Array(state.board[row].length) as _, col}
       <div
         class="cell"
+        class:player0-control={state.board[col][row].controlStatus?.playerId === 0}
+        class:player1-control={state.board[col][row].controlStatus?.playerId === 1}
+        style="--control-strength: {state.board[col][row].controlStatus?.strength || 0}"
         role="button"
         tabindex="0"
         ondrop={(e) => handleDrop(e, row, col)}
@@ -83,13 +86,23 @@
     border-radius: 2px;
     width: var(--cell-size);
     height: var(--cell-size);
+    transition: background-color 0.3s ease;
+  }
+
+  .player0-control {
+    background-color: rgba(0, 0, 255, calc(var(--control-strength) * 0.2));
+  }
+
+  .player1-control {
+    background-color: rgba(255, 0, 0, calc(var(--control-strength) * 0.2));
   }
 
   .deployed-card {
     position: absolute;
     width: calc(var(--cell-size) - 6px);
     height: calc(var(--cell-size) - 6px);
-    background-color: #f0f0f0;
+    background-color: #333;
+    color: white;
     border: 1px solid #ccc;
     border-radius: 8px;
     display: flex;

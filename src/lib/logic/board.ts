@@ -1,22 +1,122 @@
 import { config } from '../config';
-import type { BattleState, Position } from '../state/model';
+import { Direction } from '../state/enums';
+import type { BattleState, ControlPattern, DeployedCard, Position } from '../state/model';
 
 export function isCellOccupied(state: BattleState, x: number, y: number) {
-  return state.deployedCards.some((card) => card.position.x === x && card.position.y === y);
+  return state.board[x][y].occupied;
+}
+
+export function getCellString(x: number, y: number) {
+  return `${x}-${y}`;
+}
+
+export function getOccupiedPositions(state: BattleState): Position[] {
+  return state.board.flatMap((row) =>
+    row.filter((cell) => cell.occupied).map((cell) => cell.position)
+  );
+}
+
+export function getOccupiedPositionsAsMap(state: BattleState): Record<string, boolean> {
+  return getOccupiedPositions(state).reduce(
+    (acc, position) => {
+      acc[getCellString(position.x, position.y)] = true;
+      return acc;
+    },
+    {} as Record<string, boolean>
+  );
 }
 
 export function getFreePositions(state: BattleState): Position[] {
-  const occupiedCells: { [key: string]: boolean } = {};
-  for (const card of state.deployedCards) {
-    occupiedCells[`${card.position.x}-${card.position.y}`] = true;
-  }
-  const freePositions = [];
+  return state.board.flatMap((row) =>
+    row.filter((cell) => !cell.occupied).map((cell) => cell.position)
+  );
+}
+
+export function computeBoardControlStatus(state: BattleState) {
+  const occupiedPositions = getOccupiedPositionsAsMap(state);
+  // map positions to players total control strength
+  const controlMap: Record<string, Record<number, number>> = {};
+  const playersInitialStrength = Object.fromEntries(state.players.map((player) => [player.id, 0]));
   for (let x = 0; x < config.boardSize; x++) {
     for (let y = 0; y < config.boardSize; y++) {
-      if (!occupiedCells[`${x}-${y}`]) {
-        freePositions.push({ x, y });
-      }
+      controlMap[getCellString(x, y)] = { ...playersInitialStrength };
     }
   }
-  return freePositions;
+
+  const fillHorizontal = (card: DeployedCard) => {
+    const { position, control } = card;
+    const { direction, distance, strength } = control as ControlPattern;
+    // fill to left
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x - i, position.y)];
+      if (!cell || occupiedPositions[getCellString(position.x - i, position.y)]) break;
+      cell[card.ownerId] = strength || 1;
+    }
+    // fill to right
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x + i, position.y)];
+      if (!cell || occupiedPositions[getCellString(position.x + i, position.y)]) break;
+      cell[card.ownerId] = strength || 1;
+    }
+  };
+
+  const fillVertical = (card: DeployedCard) => {
+    const { position, control } = card;
+    const { direction, distance, strength } = control as ControlPattern;
+    // fill to top
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x, position.y - i)];
+      if (!cell || occupiedPositions[getCellString(position.x, position.y - i)]) break;
+      cell[card.ownerId] = strength || 1;
+    }
+    // fill to bottom
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x, position.y + i)];
+      if (!cell || occupiedPositions[getCellString(position.x, position.y + i)]) break;
+      cell[card.ownerId] = strength || 1;
+    }
+  };
+
+  // fill map with deployed cards strengths
+  // an occupied cell stops the propagation of control in that direction
+  for (const card of state.deployedCards.filter((card) => card.control)) {
+    switch (card.control?.direction) {
+      case Direction.Horizontal:
+        fillHorizontal(card);
+        break;
+      case Direction.Vertical:
+        fillVertical(card);
+        break;
+      case Direction.All:
+        fillHorizontal(card);
+        fillVertical(card);
+        break;
+      default:
+        break;
+    }
+  }
+
+  // update board cells with control status
+  for (let x = 0; x < config.boardSize; x++) {
+    for (let y = 0; y < config.boardSize; y++) {
+      const cell = controlMap[getCellString(x, y)];
+      let maxStrength = 0;
+      let secondMaxStrength = 0;
+      let playerId = -1;
+      Object.entries(cell).forEach(([key, strength]) => {
+        if (strength > maxStrength) {
+          secondMaxStrength = maxStrength;
+          maxStrength = strength;
+          playerId = parseInt(key);
+        }
+      });
+      state.board[x][y].controlStatus =
+        playerId !== -1
+          ? {
+              strength: maxStrength - secondMaxStrength,
+              playerId,
+            }
+          : null;
+    }
+  }
 }
