@@ -1,4 +1,6 @@
 export type BattleState = {
+  turn: number;
+  activePlayerId: number;
   players: Player[];
   deployedCards: DeployedCard[];
 };

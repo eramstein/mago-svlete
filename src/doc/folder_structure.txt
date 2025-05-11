@@ -1,0 +1,7 @@
+There are 4 main folders/modules in that project:
+
+- Data: contains game design, such as card templates (cost, values...)
+- State: main data model, reactive Svelte $state used by the UI, save/load/reset functions
+- Logic: the game logic code, purely TS, no Svelte. No import from Ui module, no direct use of $state (it has to be passed as a param to all functions).
+  This allows easy switch to another rendering library if needed, and can allow operating on any state variable (e.g. for testing or creating virtual states for AI exploration)
+- Ui: Svelte components displaying $state and calling game logic functions to update it

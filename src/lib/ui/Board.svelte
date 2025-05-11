@@ -8,7 +8,7 @@
     const cardData = e.dataTransfer?.getData('text/plain');
     if (cardData) {
       const card = JSON.parse(cardData);
-      deployCard(card, { x: col, y: row });
+      deployCard(state, card, { x: col, y: row });
     }
   }
 
@@ -27,7 +27,7 @@
         ondrop={(e) => handleDrop(e, row, col)}
         ondragover={handleDragOver}
       >
-        {row}, {col}
+        {row} - {col}
       </div>
     {/each}
   {/each}
@@ -57,6 +57,9 @@
   }
 
   .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: white;
     border-radius: 2px;
     width: var(--cell-size);

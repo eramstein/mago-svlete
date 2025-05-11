@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { Player } from '../state/model';
   import { config } from '../config';
+  import { state } from '../state/state.svelte';
   let { player }: { player: Player } = $props();
 </script>
 
 <div>
+  <div class="name">{player.name}</div>
   <div class="hand" style="--card-size: {config.cellSize - 4}px">
     {#if player.hand.length === 0}
       <p>No cards in hand</p>
@@ -13,7 +15,7 @@
         {#each player.hand as card}
           <div
             class="card"
-            draggable="true"
+            draggable={state.activePlayerId === player.id}
             role="button"
             tabindex="0"
             ondragstart={(e) => {
@@ -29,6 +31,12 @@
 </div>
 
 <style>
+  .name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+  }
+
   .hand {
     margin-top: 0.5rem;
   }
