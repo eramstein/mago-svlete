@@ -3,6 +3,7 @@
   import { config } from '../config';
   import { state } from '../state/state.svelte';
   import { send, receive } from './transitions/crossfade';
+  import { flip } from 'svelte/animate';
 
   let { player }: { player: Player } = $props();
 </script>
@@ -25,6 +26,7 @@
             }}
             in:receive={{ key: card.instanceId }}
             out:send={{ key: card.instanceId }}
+            animate:flip={{ duration: 200 }}
           >
             <span>{card.name}</span>
           </div>

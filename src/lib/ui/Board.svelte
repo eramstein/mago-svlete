@@ -3,6 +3,22 @@
   import { deployCard } from '../logic/card';
   import { state } from '../state/state.svelte';
   import { send, receive } from './transitions/crossfade';
+  import cardDeploySound from '../../assets/sounds/card-deploy.mp3';
+
+  const deploySound = new Audio(cardDeploySound);
+  let previousDeployedCardsLength = state.deployedCards.length;
+
+  function playDeploySound() {
+    deploySound.currentTime = 0;
+    deploySound.play().catch((err) => console.log('Error playing sound:', err));
+  }
+
+  $effect(() => {
+    if (state.deployedCards.length > previousDeployedCardsLength) {
+      playDeploySound();
+    }
+    previousDeployedCardsLength = state.deployedCards.length;
+  });
 
   function handleDrop(e: DragEvent, row: number, col: number) {
     e.preventDefault();
