@@ -1,6 +1,6 @@
 <script lang="ts">
   import { config } from '../config';
-  import { Direction } from '../state/enums';
+  import { ControlDirection } from '../state/enums';
   import type { ControlPattern } from '../state/model';
 
   let { pattern }: { pattern: ControlPattern } = $props();
@@ -9,20 +9,20 @@
 </script>
 
 <div class="control-preview">
-  {#if pattern.direction === Direction.Horizontal}
+  {#if pattern.direction === ControlDirection.Horizontal}
     <div class="arrows horizontal">
       <div>{distance}</div>
       <div class="value">{strength}</div>
       <div>{distance}</div>
     </div>
-  {:else if pattern.direction === Direction.Vertical}
+  {:else if pattern.direction === ControlDirection.Vertical}
     <div class="arrows vertical">
       <div>{distance}</div>
       <div class="value">{strength}</div>
       <div>{distance}</div>
       <div></div>
     </div>
-  {:else if pattern.direction === Direction.All}
+  {:else if pattern.direction === ControlDirection.All}
     <div class="arrows all">
       <div>{distance}</div>
       <div class="arrows horizontal">

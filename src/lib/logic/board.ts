@@ -1,5 +1,5 @@
 import { config } from '../config';
-import { Direction } from '../state/enums';
+import { ControlDirection } from '../state/enums';
 import type { BattleState, ControlPattern, DeployedCard, Position } from '../state/model';
 
 export function isCellOccupied(state: BattleState, x: number, y: number) {
@@ -81,13 +81,13 @@ export function computeBoardControlStatus(state: BattleState) {
   // an occupied cell stops the propagation of control in that direction
   for (const card of state.deployedCards) {
     switch (card.control?.direction) {
-      case Direction.Horizontal:
+      case ControlDirection.Horizontal:
         fillHorizontal(card);
         break;
-      case Direction.Vertical:
+      case ControlDirection.Vertical:
         fillVertical(card);
         break;
-      case Direction.All:
+      case ControlDirection.All:
         fillHorizontal(card);
         fillVertical(card);
         break;

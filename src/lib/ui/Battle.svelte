@@ -6,6 +6,7 @@
   import CardInfo from './CardInfo.svelte';
   import Player from './Player.svelte';
   import Board from './Board.svelte';
+  import { cancelCardSelected } from './helpers';
 
   function playAgain() {
     resetState();
@@ -18,16 +19,13 @@
     <Player player={gs.players[0]} />
   </div>
   <div class="board-container">
-    <div class="turn">
-      Turn {gs.turn}
-    </div>
     <Board />
   </div>
   <div class="player-container right">
     <Player player={gs.players[1]} />
   </div>
   {#if uiState.selectedCard}
-    <div class="popover-container">
+    <div class="popover-container" on:click={() => cancelCardSelected()}>
       <CardInfo card={uiState.selectedCard} />
     </div>
   {/if}
@@ -57,14 +55,6 @@
 
   .board-container {
     flex: 1;
-  }
-
-  .turn {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    margin-bottom: 1rem;
   }
 
   .winner-container {
@@ -98,6 +88,6 @@
     transform: translate(-50%, -50%);
     border-radius: 1rem;
     padding: 1rem;
-    background-color: #333;
+    background-color: #222;
   }
 </style>

@@ -8,5 +8,5 @@ export function loadCardImages() {
 }
 
 export function getCardImage(cardId: string) {
-  return images.cards[`../../../assets/images/cards/${cardId}.png`]?.default;
+  return images.cards?.[`../../../assets/images/cards/${cardId}.png`]?.default;
 }

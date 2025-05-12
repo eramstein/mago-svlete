@@ -1,4 +1,4 @@
-import type { Direction } from './enums';
+import type { AttackDirection, CardType, ControlDirection } from './enums';
 
 export type BattleState = {
   turn: number;
@@ -18,7 +18,10 @@ export type Player = {
 export type CardTemplate = {
   id: string;
   name: string;
+  type: CardType;
+  hp: number;
   control?: ControlPattern;
+  attack?: AttackPattern;
 };
 
 export type Card = CardTemplate & {
@@ -28,6 +31,7 @@ export type Card = CardTemplate & {
 
 export type DeployedCard = Card & {
   position: Position;
+  hpCurrent: number;
 };
 
 export type Position = {
@@ -36,13 +40,18 @@ export type Position = {
 };
 
 export type ControlPattern = {
-  direction: Direction;
+  direction: ControlDirection;
   distance?: number;
   strength?: number;
 };
 
 export type ControlStatus = {
   playerId: number;
+  strength: number;
+};
+
+export type AttackPattern = {
+  directions?: AttackDirection[];
   strength: number;
 };
 

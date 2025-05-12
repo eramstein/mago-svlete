@@ -1,6 +1,6 @@
 import { config } from '../../config';
 import { getCellString } from '../../logic/board';
-import { Direction } from '../../state/enums';
+import { ControlDirection } from '../../state/enums';
 import type { ControlPattern, DeployedCard } from '../../state/model';
 
 export function getImpactedCellsPreview(
@@ -33,13 +33,13 @@ export function getImpactedCellsPreview(
   };
 
   switch (control.direction) {
-    case Direction.Horizontal:
+    case ControlDirection.Horizontal:
       fillHorizontal();
       break;
-    case Direction.Vertical:
+    case ControlDirection.Vertical:
       fillVertical();
       break;
-    case Direction.All:
+    case ControlDirection.All:
       fillHorizontal();
       fillVertical();
       break;

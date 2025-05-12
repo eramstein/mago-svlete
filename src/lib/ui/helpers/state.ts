@@ -8,3 +8,7 @@ export function toggleCardSelected(card: Card) {
     uiState.selectedCard = card;
   }
 }
+
+export function cancelCardSelected() {
+  uiState.selectedCard = null;
+}

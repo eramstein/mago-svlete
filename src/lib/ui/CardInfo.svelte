@@ -2,6 +2,7 @@
   import ControlPreview from './ControlPreview.svelte';
   import type { Card } from '../state/model';
   import { getCardImage } from './helpers';
+  import AttackPreview from './AttackPreview.svelte';
 
   let { card }: { card: Card } = $props();
 </script>
@@ -9,13 +10,24 @@
 <div class="card-info">
   <div class="title">
     <div class="card-name">{card.name}</div>
-    {#if card.control}
-      <div class="control-preview-container">
-        <ControlPreview pattern={card.control} />
-      </div>
-    {/if}
   </div>
   <div class="card-image" style="background-image: url({getCardImage(card.id)})"></div>
+  <div class="card-description"></div>
+  <div class="patterns-container">
+    <div class="preview-container attack">
+      {#if card.attack}
+        <AttackPreview pattern={card.attack} />
+      {/if}
+    </div>
+    <div class="hp-container">
+      {card.hp}
+    </div>
+    <div class="preview-container control">
+      {#if card.control}
+        <ControlPreview pattern={card.control} />
+      {/if}
+    </div>
+  </div>
 </div>
 
 <style>
@@ -24,6 +36,8 @@
     background-color: #fff;
     width: 256px;
     height: 512px;
+    display: flex;
+    flex-direction: column;
   }
 
   .title {
@@ -31,20 +45,46 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    background-color: #f5f5f5;
-    height: 80px;
+    background-color: #3b3b3b;
+    height: 60px;
+    color: #f5f5f5;
   }
 
-  .control-preview-container {
-    position: absolute;
-    width: 80px;
-    height: 80px;
+  .patterns-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #222;
+    color: #fff;
+    height: 76px;
+  }
+
+  .preview-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    top: 0px;
-    right: 0px;
-    background-color: #f5f5f5;
+    height: 100%;
+    width: 33%;
+  }
+
+  .preview-container.attack {
+    background-color: #171e8894;
+  }
+
+  .preview-container.control {
+    background-color: #4e57d494;
+  }
+
+  .hp-container {
+    background-color: #8b0c0c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
   }
 
   .card-name {
@@ -57,5 +97,9 @@
     height: 256px;
     background-size: cover;
     background-position: center;
+  }
+
+  .card-description {
+    margin-top: auto;
   }
 </style>
