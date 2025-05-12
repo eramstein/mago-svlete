@@ -4,26 +4,11 @@
   import { config } from '../config';
   import { deployCard, getCellString } from '../logic';
   import { gs, uiState } from '../state';
-  import { getImpactedCellsPreview, getCardImage } from './helpers';
+  import { getImpactedCellsPreview, getAttackedCellsPreview, getCardImage } from './helpers';
 
-  import cardDeploySound from '../../assets/sounds/card-deploy.mp3';
-
-  const deploySound = new Audio(cardDeploySound);
-  let previousDeployedCardsLength = gs.deployedCards.length;
   let dragOverCell: { row: number; col: number } | null = $state(null);
   let impactedCellsPreview: Record<string, boolean> = $state({});
-
-  function playDeploySound() {
-    deploySound.currentTime = 0;
-    deploySound.play().catch((err) => console.log('Error playing sound:', err));
-  }
-
-  $effect(() => {
-    if (gs.deployedCards.length > previousDeployedCardsLength) {
-      playDeploySound();
-    }
-    previousDeployedCardsLength = gs.deployedCards.length;
-  });
+  let attackedCellsPreview: Record<string, boolean> = $state({});
 
   function handleDrop(e: DragEvent, row: number, col: number) {
     e.preventDefault();
@@ -33,6 +18,7 @@
     }
     uiState.draggedCard = null;
     impactedCellsPreview = {};
+    attackedCellsPreview = {};
   }
 
   function handleDragOver(e: DragEvent) {
@@ -48,12 +34,19 @@
         y: row,
       });
     }
+    if (uiState.draggedCard?.attack) {
+      attackedCellsPreview = getAttackedCellsPreview(uiState.draggedCard.attack, {
+        x: col,
+        y: row,
+      });
+    }
   }
 
   function handleDragLeave(e: DragEvent) {
     e.preventDefault();
     dragOverCell = null;
     impactedCellsPreview = {};
+    attackedCellsPreview = {};
   }
 </script>
 
@@ -73,7 +66,11 @@
         ondragover={handleDragOver}
         ondragenter={(e) => handleDragEnter(e, row, col)}
         ondragleave={handleDragLeave}
-      ></div>
+      >
+        {#if attackedCellsPreview[getCellString(col, row)]}
+          <div class="attacked">⚔️</div>
+        {/if}
+      </div>
     {/each}
   {/each}
   {#each gs.deployedCards as card (card.instanceId)}
@@ -145,5 +142,14 @@
 
   .cell.impacted {
     box-shadow: inset 0 0 0 2px rgb(35, 49, 213, 0.5);
+  }
+
+  .cell .attacked {
+    border-radius: 50%;
+    background-color: rgba(213, 49, 35);
+    border: 2px solid white;
+    padding: 5px;
+    font-size: 30px;
+    z-index: 1;
   }
 </style>

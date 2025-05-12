@@ -1,7 +1,7 @@
 import { config } from '../../config';
 import { getCellString } from '../../logic/board';
-import { ControlDirection } from '../../state/enums';
-import type { ControlPattern, DeployedCard } from '../../state/model';
+import { AttackDirection, ControlDirection } from '../../state/enums';
+import type { ControlPattern, AttackPattern } from '../../state/model';
 
 export function getImpactedCellsPreview(
   control: ControlPattern,
@@ -48,4 +48,29 @@ export function getImpactedCellsPreview(
   }
 
   return controlMap;
+}
+
+export function getAttackedCellsPreview(
+  attackPattern: AttackPattern,
+  position: { x: number; y: number }
+) {
+  const attackedCells: Record<string, boolean> = {};
+
+  if (!attackPattern.directions || attackPattern.directions?.includes(AttackDirection.Up)) {
+    attackedCells[getCellString(position.x, position.y - 1)] = true;
+  }
+
+  if (!attackPattern.directions || attackPattern.directions?.includes(AttackDirection.Down)) {
+    attackedCells[getCellString(position.x, position.y + 1)] = true;
+  }
+
+  if (!attackPattern.directions || attackPattern.directions?.includes(AttackDirection.Left)) {
+    attackedCells[getCellString(position.x - 1, position.y)] = true;
+  }
+
+  if (!attackPattern.directions || attackPattern.directions?.includes(AttackDirection.Right)) {
+    attackedCells[getCellString(position.x + 1, position.y)] = true;
+  }
+
+  return attackedCells;
 }

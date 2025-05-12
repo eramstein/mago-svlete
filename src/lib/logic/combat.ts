@@ -1,6 +1,9 @@
 import type { BattleState, Position } from '../state/model';
 import type { DeployedCard } from '../state';
 import { AttackDirection } from '../state/enums';
+import { removeCard } from './card';
+import { playAttackHeavySound, playAttackLightSound } from '../sounds';
+import { config } from '../config';
 
 export function attack(state: BattleState, card: DeployedCard) {
   if (!card.attack) {
@@ -14,13 +17,20 @@ export function attack(state: BattleState, card: DeployedCard) {
     AttackDirection.Right,
   ];
 
-  directions.forEach((direction) => {
+  directions.forEach((direction, index) => {
     const target = getTargetPosition(card.position, direction);
     const targetCard = state.deployedCards.find(
       (c) => c.ownerId !== card.ownerId && c.position.x === target.x && c.position.y === target.y
     );
     if (targetCard) {
       damageCard(state, targetCard, card.attack?.strength || 0);
+      window.setTimeout(() => {
+        if (card.attack?.strength && card.attack.strength > 1) {
+          playAttackHeavySound();
+        } else {
+          playAttackLightSound();
+        }
+      }, config.soundDelay * index);
     }
   });
 }
@@ -28,7 +38,7 @@ export function attack(state: BattleState, card: DeployedCard) {
 function damageCard(state: BattleState, card: DeployedCard, damage: number) {
   card.hpCurrent -= damage;
   if (card.hpCurrent <= 0) {
-    state.deployedCards = state.deployedCards.filter((c) => c.instanceId !== card.instanceId);
+    removeCard(state, card);
   }
 }
 

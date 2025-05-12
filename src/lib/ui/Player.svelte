@@ -9,7 +9,7 @@
   let { player }: { player: Player } = $props();
 </script>
 
-<div>
+<div class="player">
   <div class="name">{player.name}</div>
   <div class="hand" style="--card-size: {config.cellSize - 4}px">
     {#if player.hand.length === 0}
@@ -34,6 +34,10 @@
 </div>
 
 <style>
+  .player {
+    min-width: 320px;
+  }
+
   .name {
     font-size: 1.5rem;
     font-weight: bold;
