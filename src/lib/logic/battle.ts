@@ -4,13 +4,13 @@ import { resetState } from '../state/state.svelte';
 
 export function initBattle() {
   const state = resetState();
-  drawCard(state, 0, cards['card-1']);
-  drawCard(state, 0, cards['card-2']);
-  drawCard(state, 0, cards['card-3']);
-  drawCard(state, 0, cards['card-4']);
+  drawCard(state, 0, cards['a_castle']);
+  drawCard(state, 0, cards['a_wall']);
+  drawCard(state, 0, cards['a_cabin']);
+  drawCard(state, 0, cards['a_bridge']);
 
-  drawCard(state, 1, cards['card-1']);
-  drawCard(state, 1, cards['card-2']);
-  drawCard(state, 1, cards['card-3']);
-  drawCard(state, 1, cards['card-4']);
+  drawCard(state, 1, cards['a_castle']);
+  drawCard(state, 1, cards['a_wall']);
+  drawCard(state, 1, cards['a_cabin']);
+  drawCard(state, 1, cards['a_bridge']);
 }

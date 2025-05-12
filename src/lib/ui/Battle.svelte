@@ -23,11 +23,14 @@
     </div>
     <Board />
   </div>
-  <div class="right">
-    {#if uiState.selectedCard}
-      <CardInfo card={uiState.selectedCard} />
-    {/if}
+  <div class="player-container right">
+    <Player player={gs.players[1]} />
   </div>
+  {#if uiState.selectedCard}
+    <div class="popover-container">
+      <CardInfo card={uiState.selectedCard} />
+    </div>
+  {/if}
   {#if gs.wonByPlayerId !== null}
     <div class="winner-container">
       <h1>Winner</h1>
@@ -86,5 +89,15 @@
     color: white;
     font-size: 1.2rem;
     margin: 0;
+  }
+
+  .popover-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 1rem;
+    padding: 1rem;
+    background-color: #333;
   }
 </style>

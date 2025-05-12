@@ -4,7 +4,7 @@
   import { config } from '../config';
   import { deployCard, getCellString } from '../logic';
   import { gs, uiState } from '../state';
-  import { getImpactedCellsPreview } from './helpers';
+  import { getImpactedCellsPreview, getCardImage } from './helpers';
 
   import cardDeploySound from '../../assets/sounds/card-deploy.mp3';
 
@@ -79,17 +79,14 @@
   {#each gs.deployedCards as card (card.instanceId)}
     <div
       class="deployed-card"
-      class:player0-control={card.ownerId === 0}
-      class:player1-control={card.ownerId === 1}
       style="
-        left: calc({card.position.x} * (var(--cell-size) + 2px) + 1px);
-        top: calc({card.position.y} * (var(--cell-size) + 2px) + 1px);
+        background-image: url({getCardImage(card.id)});
+        left: calc({card.position.x} * (var(--cell-size) + 2px) + 3px);
+        top: calc({card.position.y} * (var(--cell-size) + 2px) + 3px);
       "
       in:receive={{ key: card.instanceId }}
       out:send={{ key: card.instanceId }}
-    >
-      <span>{card.name}</span>
-    </div>
+    ></div>
   {/each}
 </div>
 
@@ -117,19 +114,11 @@
   }
 
   .cell.player0-control {
-    background-color: rgba(0, 0, 255, calc(var(--control-strength) * 0.2));
+    background-color: rgba(35, 49, 213, calc(var(--control-strength) * 0.2));
   }
 
   .cell.player1-control {
-    background-color: rgba(255, 0, 0, calc(var(--control-strength) * 0.2));
-  }
-
-  .deployed-card.player0-control {
-    border-color: rgba(0, 0, 255);
-  }
-
-  .deployed-card.player1-control {
-    border-color: rgba(255, 0, 0);
+    background-color: rgba(213, 49, 35, calc(var(--control-strength) * 0.2));
   }
 
   .deployed-card {
@@ -138,18 +127,15 @@
     height: calc(var(--cell-size) - 6px);
     background-color: #333;
     color: white;
-    border: 2px solid #ccc;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .deployed-card span {
-    font-size: 0.8rem;
-    word-break: break-word;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   .cell.drag-over {

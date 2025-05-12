@@ -5,6 +5,7 @@
   import { send, receive } from './transitions/crossfade';
   import { flip } from 'svelte/animate';
   import { uiState } from '../state/state-ui.svelte';
+  import { getCardImage, toggleCardSelected } from './helpers';
   let { player }: { player: Player } = $props();
 </script>
 
@@ -18,17 +19,14 @@
         {#each player.hand as card (card.instanceId)}
           <div
             class="card"
+            style="background-image: url({getCardImage(card.id)})"
             draggable={gs.activePlayerId === player.id}
             ondragstart={() => (uiState.draggedCard = card)}
             in:receive={{ key: card.instanceId }}
             out:send={{ key: card.instanceId }}
             animate:flip={{ duration: 200 }}
-            onclick={() => {
-              uiState.selectedCard = card;
-            }}
-          >
-            <span>{card.name}</span>
-          </div>
+            onclick={() => toggleCardSelected(card)}
+          ></div>
         {/each}
       </div>
     {/if}
@@ -64,10 +62,8 @@
     text-align: center;
     padding: 0.25rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .card span {
-    font-size: 0.8rem;
-    word-break: break-word;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 </style>

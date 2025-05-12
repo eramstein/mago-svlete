@@ -79,7 +79,7 @@ export function computeBoardControlStatus(state: BattleState) {
 
   // fill map with deployed cards strengths
   // an occupied cell stops the propagation of control in that direction
-  for (const card of state.deployedCards.filter((card) => card.control)) {
+  for (const card of state.deployedCards) {
     switch (card.control?.direction) {
       case Direction.Horizontal:
         fillHorizontal(card);
@@ -94,6 +94,8 @@ export function computeBoardControlStatus(state: BattleState) {
       default:
         break;
     }
+    const cell = controlMap[getCellString(card.position.x, card.position.y)];
+    cell[card.ownerId] = 10;
   }
 
   // update board cells with control status
