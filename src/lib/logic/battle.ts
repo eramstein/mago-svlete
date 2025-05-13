@@ -1,6 +1,7 @@
 import { cards } from '../../data/cards';
 import { drawCard } from './card';
 import { resetState } from '../state/state.svelte';
+import { playAiTurn } from './ai';
 
 export function initBattle() {
   const state = resetState();
@@ -21,4 +22,6 @@ export function initBattle() {
   drawCard(state, 1, cards['c_footman']);
   drawCard(state, 1, cards['c_golem']);
   drawCard(state, 1, cards['c_dragon']);
+
+  playAiTurn(state);
 }

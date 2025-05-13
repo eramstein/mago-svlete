@@ -4,11 +4,16 @@
   import { config } from '../config';
   import { deployCard, getCellString } from '../logic';
   import { gs, uiState } from '../state';
-  import { getImpactedCellsPreview, getAttackedCellsPreview, getCardImage } from './helpers';
+  import {
+    getImpactedCellsPreview,
+    getAttackedCellsPreview,
+    getCardImage,
+    toggleCardSelected,
+  } from './helpers';
 
   let dragOverCell: { row: number; col: number } | null = $state(null);
   let impactedCellsPreview: Record<string, boolean> = $state({});
-  let attackedCellsPreview: Record<string, boolean> = $state({});
+  let attackedCellsPreview: Record<string, number> = $state({});
 
   function handleDrop(e: DragEvent, row: number, col: number) {
     e.preventDefault();
@@ -68,7 +73,7 @@
         ondragleave={handleDragLeave}
       >
         {#if attackedCellsPreview[getCellString(col, row)]}
-          <div class="attacked">⚔️</div>
+          <div class="attacked">{attackedCellsPreview[getCellString(col, row)]}⚔️</div>
         {/if}
       </div>
     {/each}
@@ -83,7 +88,10 @@
       "
       in:receive={{ key: card.instanceId }}
       out:send={{ key: card.instanceId }}
-    ></div>
+      onclick={() => toggleCardSelected(card)}
+    >
+      <div class="card-hp">{card.hpCurrent}</div>
+    </div>
   {/each}
 </div>
 
@@ -134,6 +142,22 @@
     background-position: center;
     background-repeat: no-repeat;
   }
+  .card-hp {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    width: 16px;
+    height: 16px;
+    color: white;
+    font-weight: bold;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 5px;
+  }
 
   .cell.drag-over {
     background-color: rgba(35, 49, 213, 0.3);
@@ -147,9 +171,10 @@
   .cell .attacked {
     border-radius: 50%;
     background-color: rgba(213, 49, 35);
+    color: white;
     border: 2px solid white;
     padding: 5px;
-    font-size: 30px;
+    font-size: 20px;
     z-index: 1;
   }
 </style>

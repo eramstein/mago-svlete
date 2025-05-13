@@ -1,16 +1,17 @@
 import type { BattleState, Position } from '../state/model';
 import type { DeployedCard } from '../state';
-import { AttackDirection } from '../state/enums';
-import { removeCard } from './card';
+import { AttackDirection, Keyword } from '../state/enums';
+import { getCardById, removeCard } from './card';
 import { playAttackHeavySound, playAttackLightSound } from '../sounds';
 import { config } from '../config';
+import { getOppositeCell } from './board';
 
-export function attack(state: BattleState, card: DeployedCard) {
-  if (!card.attack) {
+export function attack(state: BattleState, attacker: DeployedCard) {
+  if (!attacker.attack) {
     return;
   }
 
-  const directions = card.attack.directions || [
+  const directions = attacker.attack.directions || [
     AttackDirection.Up,
     AttackDirection.Down,
     AttackDirection.Left,
@@ -18,14 +19,16 @@ export function attack(state: BattleState, card: DeployedCard) {
   ];
 
   directions.forEach((direction, index) => {
-    const target = getTargetPosition(card.position, direction);
+    const target = getTargetPosition(attacker.position, direction);
     const targetCard = state.deployedCards.find(
-      (c) => c.ownerId !== card.ownerId && c.position.x === target.x && c.position.y === target.y
+      (c) =>
+        c.ownerId !== attacker.ownerId && c.position.x === target.x && c.position.y === target.y
     );
     if (targetCard) {
-      damageCard(state, targetCard, card.attack?.strength || 0);
+      const strength = applyFlanking(state, attacker, direction);
+      damageCard(state, targetCard, strength);
       window.setTimeout(() => {
-        if (card.attack?.strength && card.attack.strength > 1) {
+        if (attacker.attack?.strength && attacker.attack.strength > 1) {
           playAttackHeavySound();
         } else {
           playAttackLightSound();
@@ -53,4 +56,18 @@ function getTargetPosition(position: Position, direction: AttackDirection): Posi
     case AttackDirection.Right:
       return { x: position.x + 1, y: position.y };
   }
+}
+
+function applyFlanking(state: BattleState, attacker: DeployedCard, direction: AttackDirection) {
+  let strength = attacker.attack?.strength || 0;
+  if (attacker.keywords?.flanking) {
+    const oppositeCell = getOppositeCell(state, attacker.position, direction);
+    if (
+      oppositeCell?.occupiedByUnitId &&
+      getCardById(state, oppositeCell.occupiedByUnitId)?.ownerId === attacker.ownerId
+    ) {
+      strength += attacker.keywords.flanking;
+    }
+  }
+  return strength;
 }

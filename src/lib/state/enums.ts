@@ -15,3 +15,14 @@ export enum CardType {
   Structure = 'structure',
   Unit = 'unit',
 }
+
+export enum Realm {
+  Hibernia = 'hibernia',
+  Frankia = 'frankia',
+  Midguard = 'midguard',
+  Arabia = 'arabia',
+}
+
+export enum Keyword {
+  Flanking = 'flanking',
+}

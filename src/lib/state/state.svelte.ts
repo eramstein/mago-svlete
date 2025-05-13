@@ -3,18 +3,20 @@ import type { BattleState } from './model';
 
 export const initialState: BattleState = {
   turn: 1,
-  activePlayerId: 0,
+  activePlayerId: 1,
   wonByPlayerId: null,
   players: [
     {
       id: 0,
-      name: 'Player 0',
+      name: 'Henry',
       hand: [],
+      score: 0,
     },
     {
       id: 1,
-      name: 'Player 1',
+      name: 'The Dude',
       hand: [],
+      score: 0,
     },
   ],
   deployedCards: [],
@@ -41,7 +43,7 @@ export const initializeBoard = (state: BattleState): BattleState => {
     Array.from({ length: config.boardSize }, (_, y) => ({
       position: { x, y },
       controlStatus: null,
-      occupied: false,
+      occupiedByUnitId: null,
     }))
   );
   return state;

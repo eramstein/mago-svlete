@@ -1,9 +1,9 @@
 import { config } from '../config';
-import { ControlDirection } from '../state/enums';
+import { AttackDirection, ControlDirection } from '../state/enums';
 import type { BattleState, ControlPattern, DeployedCard, Position } from '../state/model';
 
 export function isCellOccupied(state: BattleState, x: number, y: number) {
-  return state.board[x][y].occupied;
+  return state.board[x][y].occupiedByUnitId !== null;
 }
 
 export function getCellString(x: number, y: number) {
@@ -12,7 +12,7 @@ export function getCellString(x: number, y: number) {
 
 export function getOccupiedPositions(state: BattleState): Position[] {
   return state.board.flatMap((row) =>
-    row.filter((cell) => cell.occupied).map((cell) => cell.position)
+    row.filter((cell) => cell.occupiedByUnitId !== null).map((cell) => cell.position)
   );
 }
 
@@ -28,7 +28,7 @@ export function getOccupiedPositionsAsMap(state: BattleState): Record<string, bo
 
 export function getFreePositions(state: BattleState): Position[] {
   return state.board.flatMap((row) =>
-    row.filter((cell) => !cell.occupied).map((cell) => cell.position)
+    row.filter((cell) => cell.occupiedByUnitId === null).map((cell) => cell.position)
   );
 }
 
@@ -120,5 +120,25 @@ export function computeBoardControlStatus(state: BattleState) {
             }
           : null;
     }
+  }
+}
+
+// returns the cell on the other side of the attack target
+export function getOppositeCell(
+  state: BattleState,
+  position: Position,
+  direction: AttackDirection
+) {
+  switch (direction) {
+    case AttackDirection.Up:
+      return position.y > 1 ? state.board[position.x][position.y - 2] : null;
+    case AttackDirection.Down:
+      return position.y < config.boardSize - 1 ? state.board[position.x][position.y + 2] : null;
+    case AttackDirection.Left:
+      return position.x > 1 ? state.board[position.x - 2][position.y] : null;
+    case AttackDirection.Right:
+      return position.x < config.boardSize - 1 ? state.board[position.x + 2][position.y] : null;
+    default:
+      return null;
   }
 }

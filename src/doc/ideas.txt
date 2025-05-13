@@ -1,0 +1,7 @@
+onDeploy abilities only?
+
+diagonal / multi directions controls ?
+
+general battle event log for activities lookup (e.g. if a unit destroyed a card last turn, damage it)
+
+4 realms (hibernia, frankia, midguard, arabia), pick one, you get 2 mercenaries from 1 other realm, and 1 mercenary from a 2nd

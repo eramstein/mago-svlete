@@ -4,18 +4,9 @@ export function computeWinner(state: BattleState) {
   if (!isGameOver(state)) {
     return;
   }
-  const playerScores: Record<number, number> = {};
-  for (const player of state.players) {
-    playerScores[player.id] = 0;
-  }
-  for (const cell of state.board.flat()) {
-    if (cell.controlStatus) {
-      playerScores[cell.controlStatus.playerId]++;
-    }
-  }
-  const winner = Object.entries(playerScores).sort((a, b) => b[1] - a[1])[0][0];
+  const winner = state.players.sort((a, b) => b.score - a.score)[0];
   if (winner) {
-    state.wonByPlayerId = parseInt(winner);
+    state.wonByPlayerId = winner.id;
   }
 }
 
@@ -27,4 +18,19 @@ export function isGameOver(state: BattleState): boolean {
     }
   });
   return result;
+}
+
+export function setPlayerScores(state: BattleState) {
+  const playerScores: Record<number, number> = {};
+  for (const player of state.players) {
+    playerScores[player.id] = 0;
+  }
+  for (const cell of state.board.flat()) {
+    if (cell.controlStatus) {
+      playerScores[cell.controlStatus.playerId]++;
+    }
+  }
+  state.players.forEach((player) => {
+    player.score = playerScores[player.id];
+  });
 }

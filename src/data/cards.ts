@@ -1,15 +1,16 @@
-import { AttackDirection, CardType, ControlDirection } from '../lib/state/enums';
+import { AttackDirection, CardType, ControlDirection, Keyword, Realm } from '../lib/state/enums';
 import type { CardTemplate } from '../lib/state/model';
 
 export const cards: Record<string, CardTemplate> = {
   a_castle: {
     id: 'a_castle',
     name: 'Camelot',
-    hp: 1,
+    hp: 5,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.Vertical,
+      direction: ControlDirection.All,
     },
+    realm: Realm.Frankia,
   },
   a_bridge: {
     id: 'a_bridge',
@@ -17,9 +18,10 @@ export const cards: Record<string, CardTemplate> = {
     hp: 3,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.All,
-      distance: 1,
+      direction: ControlDirection.Vertical,
+      distance: 2,
     },
+    realm: Realm.Frankia,
   },
   a_cabin: {
     id: 'a_cabin',
@@ -27,16 +29,18 @@ export const cards: Record<string, CardTemplate> = {
     hp: 1,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.Horizontal,
-      distance: 3,
+      direction: ControlDirection.All,
+      distance: 1,
       strength: 2,
     },
+    realm: Realm.Frankia,
   },
   a_wall: {
     id: 'a_wall',
     name: 'Stone Wall',
     hp: 99,
     type: CardType.Structure,
+    realm: Realm.Frankia,
   },
   c_cavalry: {
     id: 'c_cavalry',
@@ -44,9 +48,18 @@ export const cards: Record<string, CardTemplate> = {
     hp: 2,
     type: CardType.Unit,
     attack: {
-      directions: [AttackDirection.Up, AttackDirection.Down],
+      directions: [AttackDirection.Left, AttackDirection.Right],
       strength: 1,
     },
+    control: {
+      direction: ControlDirection.Horizontal,
+      distance: 1,
+      strength: 1,
+    },
+    keywords: {
+      flanking: 1,
+    },
+    realm: Realm.Frankia,
   },
   c_footman: {
     id: 'c_footman',
@@ -54,13 +67,14 @@ export const cards: Record<string, CardTemplate> = {
     hp: 1,
     type: CardType.Unit,
     attack: {
-      strength: 1,
+      directions: [AttackDirection.Up, AttackDirection.Down],
+      strength: 2,
     },
     control: {
-      direction: ControlDirection.All,
-      distance: 2,
+      direction: ControlDirection.Vertical,
       strength: 1,
     },
+    realm: Realm.Frankia,
   },
   c_dragon: {
     id: 'c_dragon',
@@ -71,6 +85,7 @@ export const cards: Record<string, CardTemplate> = {
       directions: [AttackDirection.Right],
       strength: 5,
     },
+    realm: Realm.Frankia,
   },
   c_golem: {
     id: 'c_golem',
@@ -80,5 +95,11 @@ export const cards: Record<string, CardTemplate> = {
     attack: {
       strength: 2,
     },
+    control: {
+      direction: ControlDirection.All,
+      distance: 1,
+      strength: 2,
+    },
+    realm: Realm.Frankia,
   },
 };
