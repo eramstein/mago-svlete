@@ -1,6 +1,8 @@
 export enum ControlDirection {
   Horizontal = 'horizontal',
   Vertical = 'vertical',
+  Diagonal = 'diagonal',
+  Cross = 'cross',
   All = 'all',
 }
 
@@ -21,6 +23,7 @@ export enum Realm {
   Frankia = 'frankia',
   Midguard = 'midguard',
   Arabia = 'arabia',
+  Italia = 'italia',
 }
 
 export enum Keyword {

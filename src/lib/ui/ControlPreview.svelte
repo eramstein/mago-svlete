@@ -22,7 +22,43 @@
       <div>{distance}</div>
       <div></div>
     </div>
+  {:else if pattern.direction === ControlDirection.Diagonal}
+    <div>
+      <div class="arrows horizontal">
+        <div>{distance}</div>
+        <div></div>
+        <div>{distance}</div>
+      </div>
+      <div class="arrows horizontal">
+        <div></div>
+        <div class="value">{strength}</div>
+        <div></div>
+      </div>
+      <div class="arrows horizontal">
+        <div>{distance}</div>
+        <div></div>
+        <div>{distance}</div>
+      </div>
+    </div>
   {:else if pattern.direction === ControlDirection.All}
+    <div>
+      <div class="arrows horizontal">
+        <div>{distance}</div>
+        <div>{distance}</div>
+        <div>{distance}</div>
+      </div>
+      <div class="arrows horizontal">
+        <div>{distance}</div>
+        <div class="value tight">{strength}</div>
+        <div>{distance}</div>
+      </div>
+      <div class="arrows horizontal">
+        <div>{distance}</div>
+        <div>{distance}</div>
+        <div>{distance}</div>
+      </div>
+    </div>
+  {:else if pattern.direction === ControlDirection.Cross}
     <div class="arrows all">
       <div>{distance}</div>
       <div class="arrows horizontal">
@@ -53,6 +89,10 @@
     flex-direction: row;
   }
 
+  .arrows.horizontal div {
+    min-width: 10px;
+  }
+
   .arrows.vertical {
     flex-direction: column;
   }
@@ -67,5 +107,9 @@
     font-size: 1.5rem;
     line-height: 1;
     padding: 0 5px;
+  }
+
+  .value.tight {
+    margin: 0px -5px;
   }
 </style>

@@ -12,7 +12,20 @@
     <div class="card-name">{card.name}</div>
   </div>
   <div class="card-image" style="background-image: url({getCardImage(card.id)})"></div>
-  <div class="card-description"></div>
+  <div class="card-description">
+    {#if card.keywords}
+      <div class="keywords">
+        {#each Object.entries(card.keywords) as [keyword, value]}
+          <div class="keyword">
+            <span class="keyword-name">{keyword}</span>
+            {#if value}
+              <span class="keyword-value">{value}</span>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
   <div class="patterns-container">
     <div class="preview-container attack">
       {#if card.attack}
@@ -100,6 +113,29 @@
   }
 
   .card-description {
-    margin-top: auto;
+    flex: 1;
+    padding: 10px;
+    background-color: #f5f5f5;
+  }
+
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: #f5f5f5;
+  }
+
+  .keyword {
+    background-color: #3b3b3b;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .keyword-value {
+    font-weight: bold;
   }
 </style>

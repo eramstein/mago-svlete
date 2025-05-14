@@ -45,7 +45,7 @@ export function computeBoardControlStatus(state: BattleState) {
 
   const fillHorizontal = (card: DeployedCard) => {
     const { position, control } = card;
-    const { direction, distance, strength } = control as ControlPattern;
+    const { distance, strength } = control as ControlPattern;
     // fill to left
     for (let i = 1; i <= (distance || config.boardSize); i++) {
       const cell = controlMap[getCellString(position.x - i, position.y)];
@@ -62,7 +62,7 @@ export function computeBoardControlStatus(state: BattleState) {
 
   const fillVertical = (card: DeployedCard) => {
     const { position, control } = card;
-    const { direction, distance, strength } = control as ControlPattern;
+    const { distance, strength } = control as ControlPattern;
     // fill to top
     for (let i = 1; i <= (distance || config.boardSize); i++) {
       const cell = controlMap[getCellString(position.x, position.y - i)];
@@ -77,6 +77,35 @@ export function computeBoardControlStatus(state: BattleState) {
     }
   };
 
+  const fillDiagonal = (card: DeployedCard) => {
+    const { position, control } = card;
+    const { distance, strength } = control as ControlPattern;
+    // fill to top left
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x - i, position.y - i)];
+      if (!cell || occupiedPositions[getCellString(position.x - i, position.y - i)]) break;
+      cell[card.ownerId] += strength || 1;
+    }
+    // fill to top right
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x + i, position.y - i)];
+      if (!cell || occupiedPositions[getCellString(position.x + i, position.y - i)]) break;
+      cell[card.ownerId] += strength || 1;
+    }
+    // fill to bottom left
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x - i, position.y + i)];
+      if (!cell || occupiedPositions[getCellString(position.x - i, position.y + i)]) break;
+      cell[card.ownerId] += strength || 1;
+    }
+    // fill to bottom right
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      const cell = controlMap[getCellString(position.x + i, position.y + i)];
+      if (!cell || occupiedPositions[getCellString(position.x + i, position.y + i)]) break;
+      cell[card.ownerId] += strength || 1;
+    }
+  };
+
   // fill map with deployed cards strengths
   // an occupied cell stops the propagation of control in that direction
   for (const card of state.deployedCards) {
@@ -87,9 +116,17 @@ export function computeBoardControlStatus(state: BattleState) {
       case ControlDirection.Vertical:
         fillVertical(card);
         break;
+      case ControlDirection.Cross:
+        fillHorizontal(card);
+        fillVertical(card);
+        break;
+      case ControlDirection.Diagonal:
+        fillDiagonal(card);
+        break;
       case ControlDirection.All:
         fillHorizontal(card);
         fillVertical(card);
+        fillDiagonal(card);
         break;
       default:
         break;
@@ -102,21 +139,21 @@ export function computeBoardControlStatus(state: BattleState) {
   for (let x = 0; x < config.boardSize; x++) {
     for (let y = 0; y < config.boardSize; y++) {
       const cell = controlMap[getCellString(x, y)];
-      let maxStrength = 0;
-      let secondMaxStrength = 0;
-      let playerId = -1;
-      Object.entries(cell).forEach(([key, strength]) => {
-        if (strength > maxStrength) {
-          secondMaxStrength = maxStrength;
-          maxStrength = strength;
-          playerId = parseInt(key);
-        }
-      });
+      let sortable: Array<[number, number]> = [];
+      for (const playerId in cell) {
+        sortable.push([parseInt(playerId), cell[playerId]]);
+      }
+      sortable.sort((a, b) => b[1] - a[1]);
+
+      const maxStrength = sortable[0][1];
+      const secondMaxStrength = sortable[1][1];
+      const playerId = sortable[0][0];
+
       state.board[x][y].controlStatus =
         playerId !== -1
           ? {
               strength: maxStrength - secondMaxStrength,
-              playerId,
+              playerId: maxStrength - secondMaxStrength === 0 ? -1 : playerId,
             }
           : null;
     }

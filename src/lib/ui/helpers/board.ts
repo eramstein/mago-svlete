@@ -32,6 +32,25 @@ export function getImpactedCellsPreview(
     }
   };
 
+  const fillDiagonal = () => {
+    // fill to top left
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      controlMap[getCellString(position.x - i, position.y - i)] = true;
+    }
+    // fill to top right
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      controlMap[getCellString(position.x + i, position.y - i)] = true;
+    }
+    // fill to bottom left
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      controlMap[getCellString(position.x - i, position.y + i)] = true;
+    }
+    // fill to bottom right
+    for (let i = 1; i <= (distance || config.boardSize); i++) {
+      controlMap[getCellString(position.x + i, position.y + i)] = true;
+    }
+  };
+
   switch (control.direction) {
     case ControlDirection.Horizontal:
       fillHorizontal();
@@ -39,9 +58,17 @@ export function getImpactedCellsPreview(
     case ControlDirection.Vertical:
       fillVertical();
       break;
+    case ControlDirection.Cross:
+      fillHorizontal();
+      fillVertical();
+      break;
+    case ControlDirection.Diagonal:
+      fillDiagonal();
+      break;
     case ControlDirection.All:
       fillHorizontal();
       fillVertical();
+      fillDiagonal();
       break;
     default:
       break;

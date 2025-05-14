@@ -1,4 +1,4 @@
-import { AttackDirection, CardType, ControlDirection, Keyword, Realm } from '../lib/state/enums';
+import { AttackDirection, CardType, ControlDirection, Realm } from '../lib/state/enums';
 import type { CardTemplate } from '../lib/state/model';
 
 export const cards: Record<string, CardTemplate> = {
@@ -8,7 +8,7 @@ export const cards: Record<string, CardTemplate> = {
     hp: 5,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.All,
+      direction: ControlDirection.Diagonal,
     },
     realm: Realm.Frankia,
   },
@@ -18,8 +18,8 @@ export const cards: Record<string, CardTemplate> = {
     hp: 3,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.Vertical,
-      distance: 2,
+      direction: ControlDirection.All,
+      distance: 1,
     },
     realm: Realm.Frankia,
   },
@@ -29,7 +29,7 @@ export const cards: Record<string, CardTemplate> = {
     hp: 1,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.All,
+      direction: ControlDirection.Cross,
       distance: 1,
       strength: 2,
     },
@@ -96,7 +96,7 @@ export const cards: Record<string, CardTemplate> = {
       strength: 2,
     },
     control: {
-      direction: ControlDirection.All,
+      direction: ControlDirection.Cross,
       distance: 1,
       strength: 2,
     },

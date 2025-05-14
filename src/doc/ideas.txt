@@ -1,7 +1,11 @@
 onDeploy abilities only?
 
-diagonal / multi directions controls ?
-
 general battle event log for activities lookup (e.g. if a unit destroyed a card last turn, damage it)
 
-4 realms (hibernia, frankia, midguard, arabia), pick one, you get 2 mercenaries from 1 other realm, and 1 mercenary from a 2nd
+5 realms (hibernia, frankia, midguard, arabia, italia), pick one, you get 2 mercenaries from 1 other realm, and 1 mercenary from a 2nd
+
+gold resource, can be harvested by controlling tiles or playing cards (e.g. mill), and used in onDeploy abilities
+
+protection zones: same as attack pattern, but units deployed within a protection zone get additional HP
+
+terrain types: cards can change cells terrain (e.g. forest) and use terrain types for abilities
