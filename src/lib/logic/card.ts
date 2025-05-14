@@ -4,6 +4,9 @@ import { computeBoardControlStatus, isCellOccupied } from './board';
 import { attack } from './combat';
 import { playDeploySound } from '../sounds';
 import { setPlayerScores } from './victory';
+import { triggerAbilities } from './abilities';
+import { AbilityTrigger } from '../state/enums';
+
 export function drawCard(state: BattleState, playerId: number, cardTemplate: CardTemplate) {
   const card = { ...cardTemplate, instanceId: crypto.randomUUID(), ownerId: playerId };
   state.players[playerId].hand.push(card);
@@ -21,6 +24,7 @@ export function deployCard(state: BattleState, card: Card, position: Position) {
     (c) => c.instanceId !== card.instanceId
   );
   attack(state, deployedCard);
+  triggerAbilities(state, AbilityTrigger.OnDeploy, deployedCard);
   computeBoardControlStatus(state);
   setPlayerScores(state);
   playDeploySound();

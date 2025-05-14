@@ -1,6 +1,12 @@
-import { AttackDirection, CardType, ControlDirection, Realm } from '../lib/state/enums';
+import {
+  AbilityTrigger,
+  AttackDirection,
+  CardType,
+  ControlDirection,
+  Realm,
+} from '../lib/state/enums';
 import type { CardTemplate } from '../lib/state/model';
-
+import { rebuild } from '../lib/logic/effects';
 export const cards: Record<string, CardTemplate> = {
   a_castle: {
     id: 'a_castle',
@@ -41,6 +47,22 @@ export const cards: Record<string, CardTemplate> = {
     hp: 99,
     type: CardType.Structure,
     realm: Realm.Frankia,
+    abilities: [
+      {
+        trigger: {
+          type: AbilityTrigger.OnDeploy,
+        },
+        targets: {
+          pattern: { direction: ControlDirection.All, distance: 1 },
+          condition: (state, card, target) => {
+            return card.ownerId === target.ownerId;
+          },
+        },
+        effect: (state, card, target) => {
+          rebuild(target, 5);
+        },
+      },
+    ],
   },
   c_cavalry: {
     id: 'c_cavalry',

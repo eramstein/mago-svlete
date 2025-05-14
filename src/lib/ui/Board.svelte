@@ -2,14 +2,9 @@
   import { send, receive } from './transitions/crossfade';
 
   import { config } from '../config';
-  import { deployCard, getCellString } from '../logic';
+  import { deployCard, getCellString, getImpactedCellsPreview } from '../logic';
   import { gs, uiState } from '../state';
-  import {
-    getImpactedCellsPreview,
-    getAttackedCellsPreview,
-    getCardImage,
-    toggleCardSelected,
-  } from './helpers';
+  import { getAttackedCellsPreview, getCardImage, toggleCardSelected } from './helpers';
 
   let dragOverCell: { row: number; col: number } | null = $state(null);
   let impactedCellsPreview: Record<string, boolean> = $state({});

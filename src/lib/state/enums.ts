@@ -29,3 +29,8 @@ export enum Realm {
 export enum Keyword {
   Flanking = 'flanking',
 }
+
+export enum AbilityTrigger {
+  OnDeploy = 'onDeploy',
+  OnAttack = 'onAttack',
+}

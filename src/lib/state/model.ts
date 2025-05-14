@@ -1,4 +1,11 @@
-import type { AttackDirection, CardType, ControlDirection, Keyword, Realm } from './enums';
+import type {
+  AbilityTrigger,
+  AttackDirection,
+  CardType,
+  ControlDirection,
+  Keyword,
+  Realm,
+} from './enums';
 
 export type BattleState = {
   turn: number;
@@ -25,6 +32,7 @@ export type CardTemplate = {
   control?: ControlPattern;
   attack?: AttackPattern;
   keywords?: Record<Keyword, number>;
+  abilities?: Ability[];
 };
 
 export type Card = CardTemplate & {
@@ -35,6 +43,20 @@ export type Card = CardTemplate & {
 export type DeployedCard = Card & {
   position: Position;
   hpCurrent: number;
+};
+
+export type Ability = {
+  trigger: {
+    type: AbilityTrigger;
+    condition?: (state: BattleState, card: DeployedCard) => boolean;
+  };
+  targets?: AbilityTargets;
+  effect: (state: BattleState, card: DeployedCard, target: DeployedCard | null) => void;
+};
+
+export type AbilityTargets = {
+  pattern?: ControlPattern;
+  condition?: (state: BattleState, card: DeployedCard, target: DeployedCard) => boolean;
 };
 
 export type Position = {
