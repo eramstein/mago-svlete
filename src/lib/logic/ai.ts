@@ -9,6 +9,8 @@ export function playAiTurn(state: BattleState) {
   const card = randomElement(player.hand);
   const pos = randomElement(getFreePositions(state));
   window.setTimeout(() => {
-    deployCard(state, card, pos);
+    if (card && pos) {
+      deployCard(state, card, pos);
+    }
   }, config.aiDelay);
 }

@@ -51,8 +51,14 @@ export type Ability = {
     condition?: (state: BattleState, card: DeployedCard) => boolean;
   };
   targets?: AbilityTargets;
-  effect: (state: BattleState, card: DeployedCard, target: DeployedCard | null) => void;
+  effect: AbilityEffect;
 };
+
+export type AbilityEffect = (
+  state: BattleState,
+  card: DeployedCard,
+  target: DeployedCard | null
+) => void;
 
 export type AbilityTargets = {
   pattern?: ControlPattern;

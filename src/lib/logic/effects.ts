@@ -1,4 +1,4 @@
-import { CardType } from '../state/enums';
+import { CardType, ControlDirection } from '../state/enums';
 import type { DeployedCard } from '../state/model';
 
 export function rebuild(target: DeployedCard | null, value: number) {
@@ -16,4 +16,11 @@ export function heal(target: DeployedCard, value: number) {
   if (target.hpCurrent > target.hp) {
     target.hpCurrent = target.hp;
   }
+}
+
+export function mezz(target: DeployedCard | null) {
+  if (!target || target.type !== CardType.Unit || !target.control) {
+    return;
+  }
+  delete target.control;
 }
