@@ -38,6 +38,7 @@ export type CardTemplate = {
 export type Card = CardTemplate & {
   instanceId: string;
   ownerId: number;
+  summoned?: boolean;
 };
 
 export type DeployedCard = Card & {

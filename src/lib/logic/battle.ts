@@ -14,7 +14,7 @@ export function initBattle() {
   drawCard(state, 0, cards['f_golem']);
   drawCard(state, 0, cards['f_dragon']);
   drawCard(state, 0, cards['h_vai']);
-
+  drawCard(state, 0, cards['h_coeurebene']);
   drawCard(state, 1, cards['f_castle']);
   drawCard(state, 1, cards['f_wall']);
   drawCard(state, 1, cards['f_cabin']);
@@ -24,6 +24,6 @@ export function initBattle() {
   drawCard(state, 1, cards['f_footman']);
   drawCard(state, 1, cards['f_golem']);
   drawCard(state, 1, cards['f_dragon']);
-
+  drawCard(state, 1, cards['f_cabin']);
   playAiTurn(state);
 }

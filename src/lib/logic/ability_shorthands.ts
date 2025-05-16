@@ -5,6 +5,10 @@ export const OnDeploy = {
   type: AbilityTrigger.OnDeploy,
 };
 
+export const OnTurnStart = {
+  type: AbilityTrigger.OnTurnStart,
+};
+
 export const TargetEnemies: AbilityTargets = {
   pattern: { direction: ControlDirection.All, distance: 1 },
   condition: (state, card, target) => {

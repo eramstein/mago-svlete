@@ -4,6 +4,7 @@ import { AbilityTrigger } from '../state/enums';
 import type { DeployedCard } from '../state/model';
 import type { BattleState } from '../state/model';
 import { getCellString, getImpactedCellsPreview } from './board';
+import { setAbilityTriggeredFlag } from '../state';
 
 export function triggerAbilities(state: BattleState, trigger: AbilityTrigger, card: DeployedCard) {
   if (!card.abilities) {
@@ -17,6 +18,9 @@ export function triggerAbilities(state: BattleState, trigger: AbilityTrigger, ca
 }
 
 function triggerAbility(state: BattleState, card: DeployedCard, ability: Ability) {
+  // Add visual feedback
+  setAbilityTriggeredFlag(card.instanceId);
+  // Call ability's effect
   if (ability.targets) {
     const validTargets = getValidTargets(state, card, ability.targets);
     validTargets.forEach((target) => {

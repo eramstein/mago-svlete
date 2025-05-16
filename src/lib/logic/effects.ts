@@ -1,5 +1,6 @@
 import { CardType, ControlDirection } from '../state/enums';
-import type { DeployedCard } from '../state/model';
+import type { BattleState, CardTemplate, DeployedCard, Position } from '../state/model';
+import { deployCard, makeTokenCard } from './card';
 
 export function rebuild(target: DeployedCard | null, value: number) {
   if (!target || target.type !== CardType.Structure) {
@@ -23,4 +24,14 @@ export function mezz(target: DeployedCard | null) {
     return;
   }
   delete target.control;
+}
+
+export function summon(
+  state: BattleState,
+  playerId: number,
+  card: CardTemplate,
+  position: Position
+) {
+  const summonedCard = makeTokenCard(playerId, card);
+  deployCard(state, summonedCard, position);
 }

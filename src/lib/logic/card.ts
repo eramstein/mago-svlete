@@ -28,7 +28,9 @@ export function deployCard(state: BattleState, card: Card, position: Position) {
   computeBoardControlStatus(state);
   setPlayerScores(state);
   playDeploySound();
-  passTurn(state);
+  if (!card.summoned) {
+    passTurn(state);
+  }
 }
 
 export function removeCard(state: BattleState, card: DeployedCard) {
@@ -38,4 +40,8 @@ export function removeCard(state: BattleState, card: DeployedCard) {
 
 export function getCardById(state: BattleState, id: string) {
   return state.deployedCards.find((c) => c.instanceId === id);
+}
+
+export function makeTokenCard(playerId: number, cardTemplate: CardTemplate) {
+  return { ...cardTemplate, instanceId: crypto.randomUUID(), ownerId: playerId, summoned: true };
 }

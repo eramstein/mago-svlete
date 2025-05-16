@@ -33,4 +33,5 @@ export enum Keyword {
 export enum AbilityTrigger {
   OnDeploy = 'onDeploy',
   OnAttack = 'onAttack',
+  OnTurnStart = 'onTurnStart',
 }

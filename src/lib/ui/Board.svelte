@@ -76,6 +76,7 @@
   {#each gs.deployedCards as card (card.instanceId)}
     <div
       class="deployed-card"
+      class:ability-triggered={uiState.abilityTriggeredCards[card.instanceId]}
       style="
         background-image: url({getCardImage(card.id)});
         left: calc({card.position.x} * (var(--cell-size) + 2px) + 3px);
@@ -136,7 +137,28 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    transition: transform 0.3s ease;
   }
+
+  .deployed-card.ability-triggered {
+    animation: ability-pulse 0.5s ease-in-out;
+  }
+
+  @keyframes ability-pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+    }
+    50% {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px 10px rgba(255, 215, 0, 0.4);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+    }
+  }
+
   .card-hp {
     position: absolute;
     bottom: 2px;
