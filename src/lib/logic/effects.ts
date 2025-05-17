@@ -9,8 +9,8 @@ export function rebuild(target: DeployedCard | null, value: number) {
   target.hpCurrent += value;
 }
 
-export function heal(target: DeployedCard, value: number) {
-  if (target.type !== CardType.Unit) {
+export function heal(target: DeployedCard | null, value: number) {
+  if (!target || target.type !== CardType.Unit) {
     return;
   }
   target.hpCurrent += value;

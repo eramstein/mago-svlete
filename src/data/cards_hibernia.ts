@@ -5,16 +5,9 @@ import {
   TargetEnemies,
 } from '../lib/logic/ability_shorthands';
 import { getFreePositions } from '../lib/logic/board';
-import { damageCard, grantKeyword, mezz, summon } from '../lib/logic/effects';
+import { damageCard, grantKeyword, heal, mezz, summon } from '../lib/logic/effects';
 import { randomElement } from '../lib/logic/random';
-import {
-  AbilityTrigger,
-  AttackDirection,
-  CardType,
-  ControlDirection,
-  Keyword,
-  Realm,
-} from '../lib/state/enums';
+import { AttackDirection, CardType, ControlDirection, Keyword, Realm } from '../lib/state/enums';
 import type { CardTemplate } from '../lib/state/model';
 import { cards } from './cards';
 
@@ -99,19 +92,91 @@ export const cardsHibernia: Record<string, CardTemplate> = {
       directions: [AttackDirection.Up, AttackDirection.Down],
       strength: 2,
     },
-    control: {
-      direction: ControlDirection.All,
-      distance: 1,
-      strength: 20,
-    },
     abilities: [
       {
         trigger: OnDeploy,
         targets: TargetAllies,
         effect: (state, card, target) => {
-          damageCard(state, target, 20);
+          heal(target, 20);
         },
       },
     ],
+  },
+  h_celtic_village: {
+    id: 'h_celtic_village',
+    name: 'Celtic Village',
+    hp: 8,
+    type: CardType.Structure,
+    realm: Realm.Hibernia,
+    control: {
+      direction: ControlDirection.Horizontal,
+      strength: 1,
+    },
+  },
+  h_bear_cabin: {
+    id: 'h_bear_cabin',
+    name: 'Bear Cabin',
+    hp: 2,
+    type: CardType.Structure,
+    realm: Realm.Hibernia,
+    control: {
+      direction: ControlDirection.Cross,
+      strength: 1,
+      distance: 1,
+    },
+    attack: {
+      strength: 1,
+    },
+  },
+  h_cursed_forest: {
+    id: 'h_cursed_forest',
+    name: 'Cursed Forest',
+    hp: 3,
+    type: CardType.Structure,
+    realm: Realm.Hibernia,
+    control: {
+      direction: ControlDirection.All,
+      strength: 5,
+      distance: 1,
+    },
+  },
+  h_fireflies_clearing: {
+    id: 'h_fireflies_clearing',
+    name: 'Fireflies Clearing',
+    hp: 99,
+    type: CardType.Structure,
+    realm: Realm.Hibernia,
+    control: {
+      direction: ControlDirection.Diagonal,
+    },
+  },
+  h_leprechaun: {
+    id: 'h_leprechaun',
+    name: 'Leprechaun',
+    hp: 3,
+    type: CardType.Unit,
+    realm: Realm.Hibernia,
+    abilities: [
+      {
+        trigger: OnTurnStart,
+        targets: TargetEnemies,
+        effect: (state, card, target) => {
+          damageCard(state, target, 1);
+        },
+      },
+    ],
+  },
+  h_treeman: {
+    id: 'h_treeman',
+    name: 'Treeman',
+    hp: 5,
+    type: CardType.Structure,
+    realm: Realm.Hibernia,
+    keywords: {
+      armor: 3,
+    },
+    control: {
+      direction: ControlDirection.Vertical,
+    },
   },
 };

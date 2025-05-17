@@ -5,12 +5,12 @@ import { cards } from '../../data/cards';
 
 export function initBattle() {
   const state = resetState();
-  drawCard(state, 0, cards['f_castle']);
-  drawCard(state, 0, cards['f_wall']);
-  drawCard(state, 0, cards['f_cabin']);
-  drawCard(state, 0, cards['f_bridge']);
-  drawCard(state, 0, cards['f_cavalry']);
-  drawCard(state, 0, cards['f_footman']);
+  drawCard(state, 0, cards['h_celtic_village']);
+  drawCard(state, 0, cards['h_bear_cabin']);
+  drawCard(state, 0, cards['h_cursed_forest']);
+  drawCard(state, 0, cards['h_leprechaun']);
+  drawCard(state, 0, cards['h_fireflies_clearing']);
+  drawCard(state, 0, cards['h_treeman']);
   drawCard(state, 0, cards['h_druid']);
   drawCard(state, 0, cards['h_franz']);
   drawCard(state, 0, cards['h_vai']);
