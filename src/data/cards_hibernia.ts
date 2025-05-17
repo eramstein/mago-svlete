@@ -1,12 +1,18 @@
-import { OnDeploy, OnTurnStart, TargetEnemies } from '../lib/logic/ability_shorthands';
+import {
+  OnDeploy,
+  OnTurnStart,
+  TargetAllies,
+  TargetEnemies,
+} from '../lib/logic/ability_shorthands';
 import { getFreePositions } from '../lib/logic/board';
-import { mezz, summon } from '../lib/logic/effects';
+import { damageCard, grantKeyword, mezz, summon } from '../lib/logic/effects';
 import { randomElement } from '../lib/logic/random';
 import {
   AbilityTrigger,
   AttackDirection,
   CardType,
   ControlDirection,
+  Keyword,
   Realm,
 } from '../lib/state/enums';
 import type { CardTemplate } from '../lib/state/model';
@@ -59,5 +65,53 @@ export const cardsHibernia: Record<string, CardTemplate> = {
       direction: ControlDirection.Cross,
       distance: 1,
     },
+  },
+  h_franz: {
+    id: 'h_franz',
+    name: 'Franz',
+    hp: 6,
+    type: CardType.Unit,
+    realm: Realm.Hibernia,
+    control: {
+      direction: ControlDirection.Cross,
+      distance: 1,
+    },
+    keywords: {
+      armor: 1,
+    },
+    abilities: [
+      {
+        trigger: OnDeploy,
+        targets: TargetAllies,
+        effect: (state, card, target) => {
+          grantKeyword(target, Keyword.Armor, 1, card.instanceId);
+        },
+      },
+    ],
+  },
+  h_druid: {
+    id: 'h_druid',
+    name: 'Druid',
+    hp: 4,
+    type: CardType.Unit,
+    realm: Realm.Hibernia,
+    attack: {
+      directions: [AttackDirection.Up, AttackDirection.Down],
+      strength: 2,
+    },
+    control: {
+      direction: ControlDirection.All,
+      distance: 1,
+      strength: 20,
+    },
+    abilities: [
+      {
+        trigger: OnDeploy,
+        targets: TargetAllies,
+        effect: (state, card, target) => {
+          damageCard(state, target, 20);
+        },
+      },
+    ],
   },
 };

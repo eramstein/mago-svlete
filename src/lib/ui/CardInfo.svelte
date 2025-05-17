@@ -1,8 +1,9 @@
 <script lang="ts">
   import ControlPreview from './ControlPreview.svelte';
-  import type { Card } from '../state/model';
+  import type { Card, Ability } from '../state/model';
   import { getCardImage } from './helpers';
   import AttackPreview from './AttackPreview.svelte';
+  import { getAbilityDescription } from '../logic/abilities';
 
   let { card }: { card: Card } = $props();
 </script>
@@ -21,6 +22,16 @@
             {#if value}
               <span class="keyword-value">{value}</span>
             {/if}
+          </div>
+        {/each}
+      </div>
+    {/if}
+    {#if card.abilities}
+      <div class="abilities">
+        {#each card.abilities as ability}
+          <div class="ability">
+            <span class="ability-trigger">{ability.trigger.type}</span>
+            <span class="ability-description">{getAbilityDescription(ability)}</span>
           </div>
         {/each}
       </div>
@@ -137,5 +148,33 @@
 
   .keyword-value {
     font-weight: bold;
+  }
+
+  .abilities {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ability {
+    background-color: #2c2c2c;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .ability-trigger {
+    color: #f5f5f5;
+    text-transform: capitalize;
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+
+  .ability-description {
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.4;
   }
 </style>

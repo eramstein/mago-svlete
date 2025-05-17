@@ -1,10 +1,11 @@
 import type { BattleState, Position } from '../state/model';
 import type { DeployedCard } from '../state';
-import { AttackDirection, Keyword } from '../state/enums';
-import { getCardById, removeCard } from './card';
+import { AttackDirection } from '../state/enums';
+import { getCardById } from './card';
 import { playAttackHeavySound, playAttackLightSound } from '../sounds';
 import { config } from '../config';
 import { getOppositeCell } from './board';
+import { damageCard } from './effects';
 
 export function attack(state: BattleState, attacker: DeployedCard) {
   if (!attacker.attack) {
@@ -25,7 +26,10 @@ export function attack(state: BattleState, attacker: DeployedCard) {
         c.ownerId !== attacker.ownerId && c.position.x === target.x && c.position.y === target.y
     );
     if (targetCard) {
-      const strength = applyFlanking(state, attacker, direction);
+      let strength = applyFlanking(state, attacker, direction);
+      if (targetCard.keywords?.armor) {
+        strength -= targetCard.keywords.armor;
+      }
       damageCard(state, targetCard, strength);
       window.setTimeout(() => {
         if (attacker.attack?.strength && attacker.attack.strength > 1) {
@@ -36,13 +40,6 @@ export function attack(state: BattleState, attacker: DeployedCard) {
       }, config.soundDelay * index);
     }
   });
-}
-
-function damageCard(state: BattleState, card: DeployedCard, damage: number) {
-  card.hpCurrent -= damage;
-  if (card.hpCurrent <= 0) {
-    removeCard(state, card);
-  }
 }
 
 function getTargetPosition(position: Position, direction: AttackDirection): Position {

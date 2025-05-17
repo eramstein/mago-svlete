@@ -36,6 +36,27 @@ export function deployCard(state: BattleState, card: Card, position: Position) {
 export function removeCard(state: BattleState, card: DeployedCard) {
   state.deployedCards = state.deployedCards.filter((c) => c.instanceId !== card.instanceId);
   state.board[card.position.x][card.position.y].occupiedByUnitId = null;
+  // if that card was granting temporary keywords, remove them
+  console.log('removing card', card.instanceId, state.deployedCards);
+  state.deployedCards.forEach((c) => {
+    if (c.temporaryKeywords) {
+      console.log('card', c.instanceId, 'has temporary keywords', c.temporaryKeywords);
+      c.temporaryKeywords
+        .filter((kw) => kw.sourceCardId === card.instanceId)
+        .forEach((kw) => {
+          if (c.keywords?.[kw.keyword]) {
+            const currentValue = c.keywords[kw.keyword] ?? 0;
+            const newValue = currentValue - kw.value;
+            console.log('removing keyword', kw.keyword, 'from', c.instanceId, 'to', newValue);
+            if (newValue <= 0) {
+              delete c.keywords[kw.keyword];
+            } else {
+              c.keywords[kw.keyword] = newValue;
+            }
+          }
+        });
+    }
+  });
 }
 
 export function getCardById(state: BattleState, id: string) {

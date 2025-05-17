@@ -45,3 +45,39 @@ function getValidTargets(state: BattleState, card: DeployedCard, targets: Abilit
     return true;
   });
 }
+
+export function getAbilityDescription(ability: Ability): string {
+  const parts: string[] = [];
+
+  // Add target description
+  if (ability.targets) {
+    if (ability.targets.pattern) {
+      const direction = ability.targets.pattern.direction;
+      const distance = ability.targets.pattern.distance || 1;
+      parts.push(`Targets ${direction} units within ${distance} space${distance > 1 ? 's' : ''}`);
+    }
+    if (ability.targets.condition) {
+      // TO DO: find a way to auto write condition description
+    }
+  }
+
+  // Add effect description by analyzing the effect function's body
+  const effectStr = ability.effect.toString();
+  if (effectStr.includes('mezz(')) {
+    parts.push('Removes control from target');
+  } else if (effectStr.includes('damageCard(')) {
+    parts.push('Deals damage to target');
+  } else if (effectStr.includes('grantKeyword(')) {
+    parts.push('Grants a keyword to target');
+  } else if (effectStr.includes('rebuild(')) {
+    parts.push('Repairs target structure');
+  } else if (effectStr.includes('summon(')) {
+    parts.push('Summons a new unit');
+  } else if (effectStr.includes('heal(')) {
+    parts.push('Heals target unit');
+  } else {
+    parts.push('Applies an effect to target');
+  }
+
+  return parts.join('. ');
+}

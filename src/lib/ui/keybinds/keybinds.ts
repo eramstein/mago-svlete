@@ -1,4 +1,4 @@
-import { loadStateFromLocalStorage } from '../../state/state.svelte';
+import { gs, loadStateFromLocalStorage } from '../../state/state.svelte';
 import { saveStateToLocalStorage } from '../../state/state.svelte';
 
 export function handleKeybinds(event: KeyboardEvent) {
@@ -14,5 +14,7 @@ export function handleKeybinds(event: KeyboardEvent) {
     event.preventDefault();
     saveStateToLocalStorage();
     console.log('State saved to localStorage');
+  } else if (event.key === 'l') {
+    console.log('Current game state:', JSON.parse(JSON.stringify(gs, null, 2)));
   }
 }

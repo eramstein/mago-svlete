@@ -31,7 +31,7 @@ export type CardTemplate = {
   hp: number;
   control?: ControlPattern;
   attack?: AttackPattern;
-  keywords?: Record<Keyword, number>;
+  keywords?: Partial<Record<Keyword, number>>;
   abilities?: Ability[];
 };
 
@@ -44,6 +44,11 @@ export type Card = CardTemplate & {
 export type DeployedCard = Card & {
   position: Position;
   hpCurrent: number;
+  temporaryKeywords?: Array<{
+    keyword: Keyword;
+    value: number;
+    sourceCardId: string;
+  }>;
 };
 
 export type Ability = {

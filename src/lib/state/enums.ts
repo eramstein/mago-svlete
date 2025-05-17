@@ -28,6 +28,7 @@ export enum Realm {
 
 export enum Keyword {
   Flanking = 'flanking',
+  Armor = 'armor',
 }
 
 export enum AbilityTrigger {

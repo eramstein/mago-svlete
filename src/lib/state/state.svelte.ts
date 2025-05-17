@@ -1,5 +1,6 @@
 import { config } from '../config';
 import type { BattleState } from './model';
+import { cards } from '../../data/cards';
 
 export const initialState: BattleState = {
   turn: 1,
@@ -63,6 +64,25 @@ export const loadStateFromLocalStorage = (): BattleState | null => {
     if (!savedState) return null;
 
     const parsedState = JSON.parse(savedState);
+
+    // Restore abilities for deployed cards
+    parsedState.deployedCards.forEach((card: any) => {
+      const template = cards[card.id];
+      if (template?.abilities) {
+        card.abilities = template.abilities;
+      }
+    });
+
+    // Restore abilities for cards in hand
+    parsedState.players.forEach((player: any) => {
+      player.hand.forEach((card: any) => {
+        const template = cards[card.id];
+        if (template?.abilities) {
+          card.abilities = template.abilities;
+        }
+      });
+    });
+
     // Update the current state with the loaded data
     Object.assign(gs, parsedState);
     return gs;

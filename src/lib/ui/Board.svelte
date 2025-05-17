@@ -174,6 +174,7 @@
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.75);
     padding: 5px;
+    font-family: sans-serif;
   }
 
   .cell.drag-over {
