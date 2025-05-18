@@ -1,4 +1,4 @@
-import type { Card } from '../../state';
+import type { Card } from '../../model';
 import { uiState } from '../../state/state-ui.svelte';
 
 export function toggleCardSelected(card: Card) {

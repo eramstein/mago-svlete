@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { Player } from '../state';
-  import { config } from '../config';
+  import type { Player } from '../model';
+  import { config } from '../config/config';
   import { gs } from '../state';
   import { send, receive } from './transitions/crossfade';
   import { flip } from 'svelte/animate';

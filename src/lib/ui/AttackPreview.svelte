@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { AttackPattern } from '../state';
-  import { AttackDirection } from '../state/enums-battle';
+  import type { AttackPattern } from '../model';
+  import { AttackDirection } from '../config/enums-battle';
 
   let { pattern }: { pattern: AttackPattern } = $props();
 

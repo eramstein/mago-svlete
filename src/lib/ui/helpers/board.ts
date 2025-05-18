@@ -1,6 +1,6 @@
 import { getCellString } from '../../logic/board';
-import { AttackDirection } from '../../state/enums-battle';
-import type { AttackPattern } from '../../state';
+import { AttackDirection } from '../../config/enums-battle';
+import type { AttackPattern } from '../../model';
 
 export function getAttackedCellsPreview(
   attackPattern: AttackPattern,

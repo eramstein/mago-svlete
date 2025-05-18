@@ -1,5 +1,5 @@
-import { ControlDirection, Keyword } from '../state/enums-battle';
-import type { Ability, AttackPattern, Card, ControlPattern } from '../state';
+import { ControlDirection, Keyword } from '../config/enums-battle';
+import type { Ability, AttackPattern, Card, ControlPattern } from '../model';
 
 export function estimateCardCost(card: Card) {
   const controlValue = card.control ? estimateControlValue(card.control) : 0;

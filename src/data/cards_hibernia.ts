@@ -13,8 +13,8 @@ import {
   ControlDirection,
   Keyword,
   Realm,
-} from '../lib/state/enums-battle';
-import type { CardTemplate } from '../lib/state';
+} from '../lib/config/enums-battle';
+import type { CardTemplate } from '../lib/model';
 import { cards } from './cards';
 
 export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {

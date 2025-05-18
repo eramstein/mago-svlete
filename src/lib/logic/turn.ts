@@ -1,9 +1,8 @@
-import type { BattleState } from '../state';
-import { AbilityTrigger } from '../state/enums-battle';
+import type { BattleState } from '../model';
+import { config, AbilityTrigger } from '../config/';
 import { playAiTurn } from './ai';
 import { computeWinner } from './victory';
 import { triggerAbilities } from './abilities';
-import { config } from '../config';
 
 export function passTurn(state: BattleState) {
   computeWinner(state);

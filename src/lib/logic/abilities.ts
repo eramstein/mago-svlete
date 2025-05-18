@@ -1,5 +1,5 @@
-import type { Ability, AbilityTargets, DeployedCard, BattleState } from '../state';
-import { AbilityTrigger } from '../state/enums-battle';
+import type { Ability, AbilityTargets, DeployedCard, BattleState } from '../model';
+import { AbilityTrigger } from '../config/enums-battle';
 import { getCellString, getImpactedCellsPreview } from './board';
 import { setAbilityTriggeredFlag } from '../state';
 
