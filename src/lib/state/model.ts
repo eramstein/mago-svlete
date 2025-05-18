@@ -26,6 +26,7 @@ export type Player = {
 export type CardTemplate = {
   id: string;
   name: string;
+  cost: number; // points value used when deckbuilding
   type: CardType;
   realm: Realm;
   hp: number;

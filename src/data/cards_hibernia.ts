@@ -11,7 +11,7 @@ import { AttackDirection, CardType, ControlDirection, Keyword, Realm } from '../
 import type { CardTemplate } from '../lib/state/model';
 import { cards } from './cards';
 
-export const cardsHibernia: Record<string, CardTemplate> = {
+export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
   h_vai: {
     id: 'h_vai',
     name: 'Vai',

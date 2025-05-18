@@ -3,7 +3,7 @@ import type { CardTemplate } from '../lib/state/model';
 import { rebuild } from '../lib/logic/effects';
 import { OnDeploy, TargetAllies } from '../lib/logic/ability_shorthands';
 
-export const cardsFrankia: Record<string, CardTemplate> = {
+export const cardsFrankia: Record<string, Omit<CardTemplate, 'cost'>> = {
   f_castle: {
     id: 'f_castle',
     name: 'Camelot',

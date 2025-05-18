@@ -6,3 +6,4 @@ folders/modules in that project:
   This allows easy switch to another rendering library if needed, and can allow operating on any state variable (e.g. for testing or creating virtual states for AI exploration)
 - Ui: Svelte components displaying $state and calling game logic functions to update it
 - Sounds: simply functions to trigger sounds. Can be called by logic or ui.
+- Tools: code used to help develop the game, not part of the game itself
