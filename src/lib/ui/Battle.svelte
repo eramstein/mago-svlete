@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { resetState, gs } from '../state/state.svelte';
+  import { resetState, gs } from '../state';
   import { initBattle } from '../logic/battle';
   import { uiState } from '../state/state-ui.svelte';
 

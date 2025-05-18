@@ -1,5 +1,5 @@
-import { AttackDirection, CardType, ControlDirection, Realm } from '../lib/state/enums';
-import type { CardTemplate } from '../lib/state/model';
+import { AttackDirection, CardType, ControlDirection, Realm } from '../lib/state/enums-battle';
+import type { CardTemplate } from '../lib/state';
 import { rebuild } from '../lib/logic/effects';
 import { OnDeploy, TargetAllies } from '../lib/logic/ability_shorthands';
 

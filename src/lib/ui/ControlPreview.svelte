@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { config } from '../config';
-  import { ControlDirection } from '../state/enums';
-  import type { ControlPattern } from '../state/model';
+  import { ControlDirection } from '../state/enums-battle';
+  import type { ControlPattern } from '../state';
 
   let { pattern }: { pattern: ControlPattern } = $props();
   let strength: number = $derived(pattern.strength || 1);

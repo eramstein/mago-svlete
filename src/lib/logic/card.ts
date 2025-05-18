@@ -1,11 +1,11 @@
-import type { BattleState, Card, CardTemplate, DeployedCard, Position } from '../state/model';
+import type { BattleState, Card, CardTemplate, DeployedCard, Position } from '../state';
 import { passTurn } from './turn';
 import { computeBoardControlStatus, isCellOccupied } from './board';
 import { attack } from './combat';
 import { playDeploySound } from '../sounds';
 import { setPlayerScores } from './victory';
 import { triggerAbilities } from './abilities';
-import { AbilityTrigger } from '../state/enums';
+import { AbilityTrigger } from '../state/enums-battle';
 
 export function drawCard(state: BattleState, playerId: number, cardTemplate: CardTemplate) {
   const card = { ...cardTemplate, instanceId: crypto.randomUUID(), ownerId: playerId };

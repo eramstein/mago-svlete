@@ -1,5 +1,5 @@
 import { config } from '../config';
-import type { BattleState } from './model';
+import type { BattleState } from './model-battle';
 import { cards } from '../../data/cards';
 
 export const initialState: BattleState = {

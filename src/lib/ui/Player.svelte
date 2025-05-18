@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Player } from '../state/model';
+  import type { Player } from '../state';
   import { config } from '../config';
-  import { gs } from '../state/state.svelte';
+  import { gs } from '../state';
   import { send, receive } from './transitions/crossfade';
   import { flip } from 'svelte/animate';
   import { uiState } from '../state/state-ui.svelte';

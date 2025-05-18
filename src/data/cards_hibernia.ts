@@ -7,8 +7,14 @@ import {
 import { getFreePositions } from '../lib/logic/board';
 import { damageCard, grantKeyword, heal, mezz, summon } from '../lib/logic/effects';
 import { randomElement } from '../lib/logic/random';
-import { AttackDirection, CardType, ControlDirection, Keyword, Realm } from '../lib/state/enums';
-import type { CardTemplate } from '../lib/state/model';
+import {
+  AttackDirection,
+  CardType,
+  ControlDirection,
+  Keyword,
+  Realm,
+} from '../lib/state/enums-battle';
+import type { CardTemplate } from '../lib/state';
 import { cards } from './cards';
 
 export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
@@ -51,13 +57,9 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
   h_shrooms_stream: {
     id: 'h_shrooms_stream',
     name: 'Shrooms Stream',
-    hp: 3,
+    hp: 1,
     type: CardType.Structure,
     realm: Realm.Hibernia,
-    control: {
-      direction: ControlDirection.Cross,
-      distance: 1,
-    },
   },
   h_franz: {
     id: 'h_franz',

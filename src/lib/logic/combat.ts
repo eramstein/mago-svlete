@@ -1,6 +1,5 @@
-import type { BattleState, Position } from '../state/model';
-import type { DeployedCard } from '../state';
-import { AttackDirection } from '../state/enums';
+import type { BattleState, Position, DeployedCard } from '../state';
+import { AttackDirection } from '../state/enums-battle';
 import { getCardById } from './card';
 import { playAttackHeavySound, playAttackLightSound } from '../sounds';
 import { config } from '../config';

@@ -1,4 +1,4 @@
-import type { Card } from './model';
+import type { Card } from './model-battle';
 
 export type UiState = {
   selectedCard: Card | null;

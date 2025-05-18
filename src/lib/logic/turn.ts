@@ -1,5 +1,5 @@
-import type { BattleState } from '../state/model';
-import { AbilityTrigger } from '../state/enums';
+import type { BattleState } from '../state';
+import { AbilityTrigger } from '../state/enums-battle';
 import { playAiTurn } from './ai';
 import { computeWinner } from './victory';
 import { triggerAbilities } from './abilities';

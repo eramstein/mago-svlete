@@ -1,5 +1,5 @@
 import { drawCard } from './card';
-import { resetState } from '../state/state.svelte';
+import { resetState } from '../state';
 import { playAiTurn } from './ai';
 import { cards } from '../../data/cards';
 

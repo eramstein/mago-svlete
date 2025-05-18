@@ -1,6 +1,6 @@
 <script lang="ts">
   import ControlPreview from './ControlPreview.svelte';
-  import type { Card, Ability } from '../state/model';
+  import type { Card, Ability } from '../state';
   import { getCardImage } from './helpers';
   import AttackPreview from './AttackPreview.svelte';
   import { getAbilityDescription } from '../logic/abilities';

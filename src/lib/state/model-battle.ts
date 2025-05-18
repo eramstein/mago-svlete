@@ -5,7 +5,7 @@ import type {
   ControlDirection,
   Keyword,
   Realm,
-} from './enums';
+} from './enums-battle';
 
 export type BattleState = {
   turn: number;

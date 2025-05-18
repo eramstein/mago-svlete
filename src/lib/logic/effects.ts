@@ -1,5 +1,5 @@
-import { CardType, Keyword } from '../state/enums';
-import type { BattleState, CardTemplate, DeployedCard, Position } from '../state/model';
+import { CardType, Keyword } from '../state/enums-battle';
+import type { BattleState, CardTemplate, DeployedCard, Position } from '../state';
 import { deployCard, makeTokenCard, removeCard } from './card';
 
 export function rebuild(target: DeployedCard | null, value: number) {

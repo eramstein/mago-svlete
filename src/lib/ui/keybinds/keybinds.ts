@@ -1,5 +1,4 @@
-import { gs, loadStateFromLocalStorage } from '../../state/state.svelte';
-import { saveStateToLocalStorage } from '../../state/state.svelte';
+import { gs, loadStateFromLocalStorage, saveStateToLocalStorage } from '../../state';
 
 export function handleKeybinds(event: KeyboardEvent) {
   if (event.key === 'F4') {
