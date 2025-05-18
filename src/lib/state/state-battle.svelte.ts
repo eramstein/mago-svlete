@@ -1,9 +1,9 @@
 import { config } from '../config/';
 import type { BattleState } from '../model/model-battle';
-import { cards } from '../../data/cards';
+import { gs } from './main.svelte';
 
-export const initialState: BattleState = {
-  turn: 1,
+export const initialBattleState: BattleState = {
+  turn: 0,
   activePlayerId: 1,
   wonByPlayerId: null,
   players: [
@@ -24,19 +24,16 @@ export const initialState: BattleState = {
   board: [],
 };
 
-export const gs: BattleState = $state(initialState);
-
-export const resetState = (): BattleState => {
-  (Object.keys(initialState) as Array<keyof BattleState>).forEach((key) => {
-    const value = initialState[key];
+export const resetBattleState = (bs: BattleState): BattleState => {
+  (Object.keys(bs) as Array<keyof BattleState>).forEach((key) => {
+    const value = bs[key];
     if (Array.isArray(value)) {
-      (gs[key] as any) = [...value];
+      (gs.battle[key] as any) = [...value];
     } else {
-      (gs[key] as any) = value;
+      (gs.battle[key] as any) = value;
     }
   });
-  initializeBoard(gs);
-  return gs;
+  return gs.battle;
 };
 
 export const initializeBoard = (state: BattleState): BattleState => {
@@ -48,46 +45,4 @@ export const initializeBoard = (state: BattleState): BattleState => {
     }))
   );
   return state;
-};
-
-export const saveStateToLocalStorage = (): void => {
-  try {
-    localStorage.setItem('battleState', JSON.stringify(gs));
-  } catch (error) {
-    console.error('Failed to save state to localStorage:', error);
-  }
-};
-
-export const loadStateFromLocalStorage = (): BattleState | null => {
-  try {
-    const savedState = localStorage.getItem('battleState');
-    if (!savedState) return null;
-
-    const parsedState = JSON.parse(savedState);
-
-    // Restore abilities for deployed cards
-    parsedState.deployedCards.forEach((card: any) => {
-      const template = cards[card.id];
-      if (template?.abilities) {
-        card.abilities = template.abilities;
-      }
-    });
-
-    // Restore abilities for cards in hand
-    parsedState.players.forEach((player: any) => {
-      player.hand.forEach((card: any) => {
-        const template = cards[card.id];
-        if (template?.abilities) {
-          card.abilities = template.abilities;
-        }
-      });
-    });
-
-    // Update the current state with the loaded data
-    Object.assign(gs, parsedState);
-    return gs;
-  } catch (error) {
-    console.error('Failed to load state from localStorage:', error);
-    return null;
-  }
 };

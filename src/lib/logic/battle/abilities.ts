@@ -1,7 +1,7 @@
-import type { Ability, AbilityTargets, DeployedCard, BattleState } from '../model';
-import { AbilityTrigger } from '../config/enums-battle';
+import type { Ability, AbilityTargets, DeployedCard, BattleState } from '@lib/model';
+import { AbilityTrigger } from '@lib/config/enums-battle';
 import { getCellString, getImpactedCellsPreview } from './board';
-import { setAbilityTriggeredFlag } from '../state';
+import { setAbilityTriggeredFlag } from '@lib/state/state-ui.svelte';
 
 export function triggerAbilities(state: BattleState, trigger: AbilityTrigger, card: DeployedCard) {
   if (!card.abilities) {

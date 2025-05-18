@@ -1,9 +1,9 @@
 <script lang="ts">
   import ControlPreview from './ControlPreview.svelte';
-  import type { Card } from '../model';
-  import { getCardImage } from './helpers';
+  import type { Card } from '@lib/model/model-battle';
+  import { getCardImage } from '../_helpers';
   import AttackPreview from './AttackPreview.svelte';
-  import { getAbilityDescription } from '../logic/abilities';
+  import { getAbilityDescription } from '@lib/logic/battle/abilities';
 
   let { card }: { card: Card } = $props();
 </script>

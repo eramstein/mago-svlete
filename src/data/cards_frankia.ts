@@ -1,7 +1,7 @@
-import { AttackDirection, CardType, ControlDirection, Realm } from '../lib/config/enums-battle';
-import type { CardTemplate } from '../lib/model';
-import { rebuild } from '../lib/logic/effects';
-import { OnDeploy, TargetAllies } from '../lib/logic/ability_shorthands';
+import { AttackDirection, CardType, ControlDirection, Realm } from '@lib/config/enums-battle';
+import type { CardTemplate } from '@lib/model/model-battle';
+import { rebuild } from '@lib/logic/battle/effects';
+import { OnDeploy, TargetAllies } from '@lib/logic/battle/ability_shorthands';
 
 export const cardsFrankia: Record<string, Omit<CardTemplate, 'cost'>> = {
   f_castle: {

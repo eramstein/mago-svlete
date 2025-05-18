@@ -1,7 +1,7 @@
-import type { BattleState, Position, DeployedCard } from '../model';
-import { config, AttackDirection } from '../config';
+import type { BattleState, Position, DeployedCard } from '@lib/model/model-battle';
+import { config, AttackDirection } from '@lib/config';
 import { getCardById } from './card';
-import { playAttackHeavySound, playAttackLightSound } from '../sounds';
+import { playAttackHeavySound, playAttackLightSound } from '@lib/sounds';
 import { getOppositeCell } from './board';
 import { damageCard } from './effects';
 

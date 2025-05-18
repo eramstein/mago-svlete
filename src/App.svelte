@@ -1,13 +1,12 @@
 <script lang="ts">
-  import Battle from './lib/ui/Battle.svelte';
+  import Main from './lib/ui/Main.svelte';
   import { initBattle } from './lib/logic/battle';
   import { onMount, onDestroy } from 'svelte';
-  import { handleKeybinds } from './lib/ui/keybinds/keybinds';
-  import { loadCardImages } from './lib/ui/helpers';
+  import { handleKeybinds } from './lib/ui/_keybinds/keybinds';
+  import { loadCardImages } from './lib/ui/_helpers';
 
   onMount(() => {
     loadCardImages();
-    initBattle();
     window.addEventListener('keydown', handleKeybinds);
   });
 
@@ -17,5 +16,5 @@
 </script>
 
 <main>
-  <Battle />
+  <Main />
 </main>

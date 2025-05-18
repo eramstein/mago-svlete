@@ -1,4 +1,5 @@
-import { gs, loadStateFromLocalStorage, saveStateToLocalStorage } from '../../state';
+import { initBattle } from '@/lib/logic/battle';
+import { loadStateFromLocalStorage, saveStateToLocalStorage, gs } from '../../state';
 
 export function handleKeybinds(event: KeyboardEvent) {
   if (event.key === 'F4') {
@@ -15,5 +16,7 @@ export function handleKeybinds(event: KeyboardEvent) {
     console.log('State saved to localStorage');
   } else if (event.key === 'l') {
     console.log('Current game state:', JSON.parse(JSON.stringify(gs, null, 2)));
+  } else if (event.key === 'b') {
+    initBattle();
   }
 }

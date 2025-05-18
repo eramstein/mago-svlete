@@ -1,11 +1,10 @@
 <script lang="ts">
-  import type { Player } from '../model';
-  import { config } from '../config/config';
-  import { gs } from '../state';
-  import { send, receive } from './transitions/crossfade';
+  import type { Player } from '@lib/model/model-battle';
+  import { config } from '@lib/config/config';
+  import { gs, uiState } from '@lib/state';
+  import { send, receive } from '../_transitions/crossfade';
   import { flip } from 'svelte/animate';
-  import { uiState } from '../state/state-ui.svelte';
-  import { getCardImage, toggleCardSelected } from './helpers';
+  import { getCardImage, toggleCardSelected } from '../_helpers';
   let { player }: { player: Player } = $props();
 </script>
 
@@ -20,7 +19,7 @@
           <div
             class="card"
             style="background-image: url({getCardImage(card.id)})"
-            draggable={gs.activePlayerId === player.id}
+            draggable={gs.battle.activePlayerId === player.id}
             ondragstart={() => (uiState.draggedCard = card)}
             in:receive={{ key: card.instanceId }}
             out:send={{ key: card.instanceId }}

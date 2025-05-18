@@ -1,5 +1,5 @@
-import { CardType, Keyword } from '../config/enums-battle';
-import type { BattleState, CardTemplate, DeployedCard, Position } from '../model';
+import { CardType, Keyword } from '@lib/config/enums-battle';
+import type { BattleState, CardTemplate, DeployedCard, Position } from '@lib/model/model-battle';
 import { deployCard, makeTokenCard, removeCard } from './card';
 
 export function rebuild(target: DeployedCard | null, value: number) {

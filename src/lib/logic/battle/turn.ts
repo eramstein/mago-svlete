@@ -1,5 +1,5 @@
-import type { BattleState } from '../model';
-import { config, AbilityTrigger } from '../config/';
+import type { BattleState } from '@lib/model/model-battle';
+import { config, AbilityTrigger } from '@lib/config';
 import { playAiTurn } from './ai';
 import { computeWinner } from './victory';
 import { triggerAbilities } from './abilities';

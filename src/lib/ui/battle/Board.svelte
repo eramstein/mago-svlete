@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { send, receive } from './transitions/crossfade';
+  import { send, receive } from '../_transitions/crossfade';
 
-  import { config } from '../config';
-  import { deployCard, getCellString, getImpactedCellsPreview } from '../logic';
-  import { gs, uiState } from '../state';
-  import { getAttackedCellsPreview, getCardImage, toggleCardSelected } from './helpers';
+  import { config } from '@lib/config/config';
+  import { deployCard, getCellString, getImpactedCellsPreview } from '@lib/logic';
+  import { uiState } from '@lib/state/state-ui.svelte';
+  import { getAttackedCellsPreview, getCardImage, toggleCardSelected } from '../_helpers';
+  import { gs } from '@lib/state/main.svelte';
 
   let dragOverCell: { row: number; col: number } | null = $state(null);
   let impactedCellsPreview: Record<string, boolean> = $state({});
@@ -14,7 +15,7 @@
     e.preventDefault();
     dragOverCell = null;
     if (uiState.draggedCard) {
-      deployCard(gs, uiState.draggedCard, { x: col, y: row });
+      deployCard(gs.battle, uiState.draggedCard, { x: col, y: row });
     }
     uiState.draggedCard = null;
     impactedCellsPreview = {};
@@ -51,15 +52,15 @@
 </script>
 
 <div class="board" style="--board-size: {config.boardSize}; --cell-size: {config.cellSize}px">
-  {#each Array(gs.board.length) as _, row}
-    {#each Array(gs.board[row].length) as _, col}
+  {#each Array(gs.battle.board.length) as _, row}
+    {#each Array(gs.battle.board[row].length) as _, col}
       <div
         class="cell"
-        class:player0-control={gs.board[col][row].controlStatus?.playerId === 0}
-        class:player1-control={gs.board[col][row].controlStatus?.playerId === 1}
+        class:player0-control={gs.battle.board[col][row].controlStatus?.playerId === 0}
+        class:player1-control={gs.battle.board[col][row].controlStatus?.playerId === 1}
         class:drag-over={dragOverCell?.row === row && dragOverCell?.col === col}
         class:impacted={impactedCellsPreview[getCellString(col, row)]}
-        style="--control-strength: {gs.board[col][row].controlStatus?.strength || 0}"
+        style="--control-strength: {gs.battle.board[col][row].controlStatus?.strength || 0}"
         role="button"
         tabindex="0"
         ondrop={(e) => handleDrop(e, row, col)}
@@ -73,7 +74,7 @@
       </div>
     {/each}
   {/each}
-  {#each gs.deployedCards as card (card.instanceId)}
+  {#each gs.battle.deployedCards as card (card.instanceId)}
     <div
       class="deployed-card"
       class:ability-triggered={uiState.abilityTriggeredCards[card.instanceId]}

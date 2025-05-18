@@ -1,4 +1,4 @@
-import type { UiState } from './model-ui';
+import type { UiState } from '../model/model-ui';
 
 export const uiState: UiState = $state({
   selectedCard: null,

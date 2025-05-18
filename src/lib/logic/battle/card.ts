@@ -1,11 +1,17 @@
-import type { BattleState, Card, CardTemplate, DeployedCard, Position } from '../model';
+import type {
+  BattleState,
+  Card,
+  CardTemplate,
+  DeployedCard,
+  Position,
+} from '@lib/model/model-battle';
 import { passTurn } from './turn';
 import { computeBoardControlStatus, isCellOccupied } from './board';
 import { attack } from './combat';
-import { playDeploySound } from '../sounds';
+import { playDeploySound } from '@lib/sounds';
 import { setPlayerScores } from './victory';
 import { triggerAbilities } from './abilities';
-import { AbilityTrigger } from '../config/enums-battle';
+import { AbilityTrigger } from '@lib/config/enums-battle';
 
 export function drawCard(state: BattleState, playerId: number, cardTemplate: CardTemplate) {
   const card = { ...cardTemplate, instanceId: crypto.randomUUID(), ownerId: playerId };

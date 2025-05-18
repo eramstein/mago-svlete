@@ -1,10 +1,16 @@
 import { drawCard } from './card';
-import { resetState } from '../state';
+import {
+  initialBattleState,
+  initializeBoard,
+  resetBattleState,
+} from '@lib/state/state-battle.svelte';
 import { playAiTurn } from './ai';
-import { cards } from '../../data/cards';
+import { cards } from '@data/cards';
 
 export function initBattle() {
-  const state = resetState();
+  const state = resetBattleState(initialBattleState);
+  initializeBoard(state);
+  state.turn = 1;
   drawCard(state, 0, cards['h_celtic_village']);
   drawCard(state, 0, cards['h_bear_cabin']);
   drawCard(state, 0, cards['h_cursed_forest']);

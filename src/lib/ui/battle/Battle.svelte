@@ -1,40 +1,47 @@
 <script lang="ts">
-  import { resetState, gs } from '../state';
-  import { initBattle } from '../logic/battle';
-  import { uiState } from '../state/state-ui.svelte';
+  import { resetBattleState, initialBattleState } from '@lib/state/state-battle.svelte';
+  import { initBattle } from '@lib/logic/battle';
+  import { uiState } from '@lib/state/state-ui.svelte';
 
   import CardInfo from './CardInfo.svelte';
   import Player from './Player.svelte';
   import Board from './Board.svelte';
-  import { cancelCardSelected } from './helpers';
+  import { cancelCardSelected } from '../_helpers';
+  import { gs } from '@lib/state/main.svelte';
 
   function playAgain() {
-    resetState();
+    resetBattleState(initialBattleState);
     initBattle();
+  }
+
+  function stopPlaying() {
+    resetBattleState(initialBattleState);
   }
 </script>
 
 <div class="battle-container">
   <div class="player-container left">
-    <Player player={gs.players[0]} />
+    <Player player={gs.battle.players[0]} />
   </div>
   <div class="board-container">
     <Board />
   </div>
   <div class="player-container right">
-    <Player player={gs.players[1]} />
+    <Player player={gs.battle.players[1]} />
   </div>
   {#if uiState.selectedCard}
     <div class="popover-container" on:click={() => cancelCardSelected()}>
       <CardInfo card={uiState.selectedCard} />
     </div>
   {/if}
-  {#if gs.wonByPlayerId !== null}
+  {#if gs.battle.wonByPlayerId !== null}
     <div class="winner-container">
       <h1>Winner</h1>
-      <p>{gs.players[gs.wonByPlayerId].name} wins!</p>
+      <p>{gs.battle.players[gs.battle.wonByPlayerId].name} wins!</p>
       <hr />
       <button on:click={() => playAgain()}>Play again</button>
+      <hr />
+      <button on:click={() => stopPlaying()}>Quit playing</button>
     </div>
   {/if}
 </div>

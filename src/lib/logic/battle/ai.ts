@@ -1,5 +1,5 @@
-import { config } from '../config';
-import type { BattleState } from '../state';
+import { config } from '@lib/config';
+import type { BattleState } from '@lib/model/model-battle';
 import { getFreePositions } from './board';
 import { deployCard } from './card';
 import { randomElement } from './random';

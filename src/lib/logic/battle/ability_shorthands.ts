@@ -1,5 +1,5 @@
-import type { AbilityTargets } from '../model';
-import { AbilityTrigger, ControlDirection } from '../config/enums-battle';
+import type { AbilityTargets } from '@lib/model/model-battle';
+import { AbilityTrigger, ControlDirection } from '@lib/config/enums-battle';
 
 export const OnDeploy = {
   type: AbilityTrigger.OnDeploy,

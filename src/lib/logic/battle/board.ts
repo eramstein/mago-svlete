@@ -1,6 +1,6 @@
-import { config } from '../config';
-import { AttackDirection, ControlDirection } from '../config/enums-battle';
-import type { BattleState, ControlPattern, DeployedCard, Position } from '../model';
+import { config } from '@lib/config';
+import { AttackDirection, ControlDirection } from '@lib/config/enums-battle';
+import type { BattleState, ControlPattern, DeployedCard, Position } from '@lib/model/model-battle';
 
 export function isCellOccupied(state: BattleState, x: number, y: number) {
   return state.board[x][y].occupiedByUnitId !== null;

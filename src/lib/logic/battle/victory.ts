@@ -1,4 +1,4 @@
-import type { BattleState } from '../state';
+import type { BattleState } from '@lib/model/model-battle';
 
 export function computeWinner(state: BattleState) {
   if (!isGameOver(state)) {

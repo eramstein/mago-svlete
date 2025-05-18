@@ -3,18 +3,18 @@ import {
   OnTurnStart,
   TargetAllies,
   TargetEnemies,
-} from '../lib/logic/ability_shorthands';
-import { getFreePositions } from '../lib/logic/board';
-import { damageCard, grantKeyword, heal, mezz, summon } from '../lib/logic/effects';
-import { randomElement } from '../lib/logic/random';
+} from '@lib/logic/battle/ability_shorthands';
+import { getFreePositions } from '@lib/logic/battle/board';
+import { damageCard, grantKeyword, heal, mezz, summon } from '@lib/logic/battle/effects';
+import { randomElement } from '@lib/logic/battle/random';
 import {
   AttackDirection,
   CardType,
   ControlDirection,
   Keyword,
   Realm,
-} from '../lib/config/enums-battle';
-import type { CardTemplate } from '../lib/model';
+} from '@lib/config/enums-battle';
+import type { CardTemplate } from '@lib/model/model-battle';
 import { cards } from './cards';
 
 export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
