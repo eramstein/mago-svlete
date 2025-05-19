@@ -4,8 +4,16 @@
   import Sim from './sim/Sim.svelte';
 </script>
 
-{#if gs.battle.turn}
-  <Battle />
-{:else}
-  <Sim />
-{/if}
+<div class="main">
+  {#if gs.battle.turn}
+    <Battle />
+  {:else}
+    <Sim />
+  {/if}
+</div>
+
+<style>
+  .main {
+    height: 100%;
+  }
+</style>

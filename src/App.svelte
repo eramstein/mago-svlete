@@ -1,6 +1,6 @@
 <script lang="ts">
   import Main from './lib/ui/Main.svelte';
-  import { initBattle } from './lib/logic/battle';
+  import ConsoleCommands from './lib/ui/ConsoleCommands.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { handleKeybinds } from './lib/ui/_keybinds/keybinds';
   import { loadCardImages } from './lib/ui/_helpers';
@@ -15,6 +15,5 @@
   });
 </script>
 
-<main>
-  <Main />
-</main>
+<Main />
+<ConsoleCommands />
