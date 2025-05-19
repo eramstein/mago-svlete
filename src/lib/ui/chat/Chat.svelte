@@ -7,6 +7,9 @@
 
   let { npcKey }: { npcKey: string } = $props();
 
+  let fullMessage = '';
+  let currentMessage = $state('');
+
   async function sendChat(e: Event) {
     const target = e.target as HTMLInputElement;
     if (!target) {
@@ -18,7 +21,17 @@
       return;
     }
     target.value = '';
-    await sendMessage('dude', message);
+    await sendMessage('dude', message, onStream);
+    currentMessage = '';
+    fullMessage = '';
+  }
+
+  function onStream(chunk: string) {
+    fullMessage += chunk;
+    // this is trick to display text only after the speech JSON property is set in the response
+    if (fullMessage.includes(': "')) {
+      currentMessage += chunk;
+    }
   }
 
   const names: Record<string, string> = {
@@ -49,6 +62,12 @@
         {/if}
       </div>
     {/each}
+    {#if currentMessage}
+      <div class="chat-bit">
+        <strong>{names.assistant}:</strong>
+        <div>{currentMessage}</div>
+      </div>
+    {/if}
   </div>
   <input class="chat-input" type="text" onchange={sendChat} />
 </div>

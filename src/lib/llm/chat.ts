@@ -98,6 +98,7 @@ export async function endChat(character: string) {
 export async function sendMessage(
   characterKey: string,
   message: string,
+  onStream: (chunk: string) => void,
   fromCharacterName: string = PLAYER_CONFIG.name
 ) {
   const messageWithSender = `${fromCharacterName} tells you this: ${message}`;
@@ -108,16 +109,31 @@ export async function sendMessage(
     speech: message,
     character: fromCharacterName,
   });
-  const response = await ollama.chat({
+
+  // Use streaming API
+  const stream = await ollama.chat({
     model: LLM_MODEL,
     messages: gs.chat[characterKey],
+    stream: true,
   });
+
+  let fullResponse = '';
+  for await (const chunk of stream) {
+    fullResponse += chunk.message.content;
+    onStream(chunk.message.content);
+  }
+
+  const startJson = fullResponse.indexOf('{');
+  if (startJson !== -1) {
+    fullResponse = fullResponse.substring(startJson);
+  }
+
   const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;
   gs.chat[characterKey].push({
     role: 'assistant',
-    content: response.message.content,
+    content: fullResponse,
     character: characterName,
-    ...parseMessage(response.message.content),
+    ...parseMessage(fullResponse),
   });
 }
 
