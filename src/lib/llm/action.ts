@@ -2,6 +2,7 @@ import ollama, { type ToolCall } from 'ollama';
 import { LLM_MODEL } from './config';
 import { getTools } from './tools';
 import { vectorDatabaseClient } from './vector-db';
+import { ActionType } from '../config';
 
 async function getToolsFromText(message: string) {
   const memoryPrompt = await queryWorldsMemory(message);
@@ -33,24 +34,24 @@ async function queryWorldsMemory(message: string) {
   return 'The following information is relevant: ' + results.documents[0] + '. ';
 }
 
-// export async function getActionFromText(actionText: string): Promise<{
-//   actionType: ActionType;
-//   args: Record<string, any>;
-// }> {
-//   const llmResponse = await getToolsFromText(actionText);
-//   const toolCalls = llmResponse.message.tool_calls;
-//   if (toolCalls === undefined || toolCalls.length === 0) {
-//     console.log("No tool found");
-//     return {
-//       actionType: ActionType.Wait,
-//       args: {},
-//     };
-//   }
-//   const tool = (toolCalls as ToolCall[])[0];
-//   const actionType = tool.function.name as ActionType;
-//   const args = tool.function.arguments;
-//   return {
-//     actionType,
-//     args,
-//   };
-// }
+export async function getActionFromText(actionText: string): Promise<{
+  actionType: ActionType;
+  args: Record<string, any>;
+}> {
+  const llmResponse = await getToolsFromText(actionText);
+  const toolCalls = llmResponse.message.tool_calls;
+  if (toolCalls === undefined || toolCalls.length === 0) {
+    console.log('No tool found');
+    return {
+      actionType: ActionType.None,
+      args: {},
+    };
+  }
+  const tool = (toolCalls as ToolCall[])[0];
+  const actionType = tool.function.name as ActionType;
+  const args = tool.function.arguments;
+  return {
+    actionType,
+    args,
+  };
+}

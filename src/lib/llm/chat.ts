@@ -44,7 +44,6 @@ async function queryNpcMemory(characterKey: string, message: string) {
   if (!results.documents.length) {
     return '';
   }
-  console.log(results.documents);
   return 'The following memory is relevant: ' + results.documents[0] + '. ';
 }
 
@@ -68,16 +67,17 @@ export function initChat(character: string, fromCharacterName: string = PLAYER_C
     fromCharacterName +
     '. ' +
     NPCS[character].systemPrompt;
-  gs.chat[character] = [
+  gs.chat.history[character] = [
     {
       role: 'system',
       content: SYSTEM_PROMPT_PREFIX + npcPrompt + SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS,
     },
   ];
+  gs.chat.chattingWith = character;
 }
 
 export async function endChat(character: string) {
-  const messages = gs.chat[character]
+  const messages = gs.chat.history[character]
     .filter((c) => c.role !== 'system')
     .map((c) => c.character + ': ' + c.speech || '')
     .join(' \n');
@@ -90,9 +90,9 @@ export async function endChat(character: string) {
     model: LLM_MODEL,
     messages: [{ role: 'user', content: promptPrefix + messages }],
   });
-  console.log(memory.message.content);
   addNpcMemory(character, memory.message.content);
-  delete gs.chat[character];
+  delete gs.chat.history[character];
+  gs.chat.chattingWith = '';
 }
 
 export async function sendMessage(
@@ -103,7 +103,7 @@ export async function sendMessage(
 ) {
   const messageWithSender = `${fromCharacterName} tells you this: ${message}`;
   const memoryPrompt = await queryNpcMemory(characterKey, messageWithSender);
-  gs.chat[characterKey].push({
+  gs.chat.history[characterKey].push({
     role: 'user',
     content: `${memoryPrompt}. ${messageWithSender}`,
     speech: message,
@@ -113,7 +113,7 @@ export async function sendMessage(
   // Use streaming API
   const stream = await ollama.chat({
     model: LLM_MODEL,
-    messages: gs.chat[characterKey],
+    messages: gs.chat.history[characterKey],
     stream: true,
   });
 
@@ -129,7 +129,7 @@ export async function sendMessage(
   }
 
   const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;
-  gs.chat[characterKey].push({
+  gs.chat.history[characterKey].push({
     role: 'assistant',
     content: fullResponse,
     character: characterName,
@@ -142,8 +142,6 @@ export function parseMessage(message: string): MessageExpansion {
   try {
     parsed = JSON.parse(message);
   } catch (e) {
-    console.log(e);
-
     return {
       speech: message,
     };

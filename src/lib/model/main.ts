@@ -5,5 +5,8 @@ import type { SimState } from './model-sim';
 export interface State {
   sim: SimState;
   battle: BattleState;
-  chat: Record<string, ChatHistory>;
+  chat: {
+    chattingWith: string;
+    history: Record<string, ChatHistory>;
+  };
 }

@@ -30,3 +30,10 @@ export interface Character {
   place: number;
   zone: number;
 }
+
+export interface ActionTypeDefinition {
+  fn: ActionEffect;
+  duration: number;
+}
+
+export type ActionEffect = (sim: SimState, character: Character, args: any) => void;

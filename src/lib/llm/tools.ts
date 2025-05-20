@@ -1,11 +1,12 @@
 import { gs } from '@/lib/state';
 import type { Tool } from 'ollama';
+import { ActionType } from '../config';
 
 const goTo: () => Tool = () => {
   return {
     type: 'function',
     function: {
-      name: 'Goto',
+      name: ActionType.GoTo,
       description: 'A person going to a different place',
       parameters: {
         type: 'object',

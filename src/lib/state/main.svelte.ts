@@ -6,7 +6,10 @@ import { initialSimState } from './state-sim.svelte';
 const initialState: State = $state({
   sim: initialSimState,
   battle: initialBattleState,
-  chat: {},
+  chat: {
+    chattingWith: '',
+    history: {},
+  },
 });
 
 export const gs: State = $state(initialState);
@@ -25,6 +28,9 @@ export const loadStateFromLocalStorage = (): State | null => {
     if (!savedState) return null;
 
     const parsedState: State = JSON.parse(savedState);
+
+    // Restore startDate
+    parsedState.sim.time.startDate = new Date(parsedState.sim.time.startDate);
 
     if (parsedState.battle) {
       // Restore abilities for deployed cards

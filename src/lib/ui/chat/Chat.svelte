@@ -49,7 +49,7 @@
     <div class="portrait" style="background-image: url({getCharacterImage(npcKey)})"></div>
   </div>
   <div id="chat-history" class="chat-history">
-    {#each gs.chat[npcKey]?.filter((m) => m.role !== 'system') as message, i}
+    {#each gs.chat.history[npcKey]?.filter((m) => m.role !== 'system') as message, i}
       <div class="chat-bit">
         <strong>{names[message.role]}:</strong>
         {#if message.speech}
