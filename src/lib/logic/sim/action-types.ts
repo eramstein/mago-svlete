@@ -1,11 +1,16 @@
 import { ActionType } from '@/lib/config';
-import { moveFromText } from './actions/move';
+import { moveTool } from './actions/move';
+import { startGameTool } from './actions/game';
 import type { ActionTypeDefinition } from '@/lib/model';
 
 export const ACTIONS: Record<string, ActionTypeDefinition> = {
   [ActionType.GoTo]: {
-    fn: moveFromText,
+    fn: moveTool,
     duration: 30,
+  },
+  [ActionType.StartGame]: {
+    fn: startGameTool,
+    duration: 10,
   },
   [ActionType.None]: {
     fn: () => {},

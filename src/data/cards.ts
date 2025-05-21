@@ -1,7 +1,7 @@
-import type { Card, CardTemplate } from '../lib/state/model';
+import type { Card, CardTemplate } from '@/lib/model';
 import { cardsFrankia } from './cards_frankia';
 import { cardsHibernia } from './cards_hibernia';
-import { estimateCardCost } from '../lib/tools/card_cost_heuristics';
+import { estimateCardCost } from '@/lib/tools/card_cost_heuristics';
 
 export const baseCards: Record<string, Omit<CardTemplate, 'cost'>> = {
   ...cardsFrankia,

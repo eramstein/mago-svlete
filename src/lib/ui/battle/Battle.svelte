@@ -26,9 +26,6 @@
   <div class="board-container">
     <Board />
   </div>
-  <div class="player-container right">
-    <Player player={gs.battle.players[1]} />
-  </div>
   {#if uiState.selectedCard}
     <div class="popover-container" on:click={() => cancelCardSelected()}>
       <CardInfo card={uiState.selectedCard} />

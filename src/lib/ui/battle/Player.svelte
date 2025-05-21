@@ -9,7 +9,6 @@
 </script>
 
 <div class="player">
-  <div class="name">{player.name} - {player.score}</div>
   <div class="hand" style="--card-size: {config.cellSize - 4}px">
     {#if player.hand.length === 0}
       <p>No cards in hand</p>

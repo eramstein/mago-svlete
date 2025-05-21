@@ -7,36 +7,40 @@
 </script>
 
 <div class="main">
-  {#if gs.battle.turn}
-    <Battle />
-  {:else}
-    <Sim />
-  {/if}
+  <div class="scene-container">
+    {#if gs.battle.turn}
+      <Battle />
+    {:else}
+      <Sim />
+    {/if}
+    <div class="actions-container">
+      <Actions />
+    </div>
+  </div>
   {#if gs.chat.chattingWith}
     <div class="chat-container">
       <Chat npcKey={gs.chat.chattingWith} />
     </div>
   {/if}
-  <div class="actions-container">
-    <Actions />
-  </div>
 </div>
 
 <style>
   .main {
+    height: 100%;
+    display: flex;
+  }
+  .scene-container {
     position: relative;
+    width: 100%;
     height: 100%;
   }
   .chat-container {
-    position: absolute;
-    bottom: 0;
-    right: 0;
     height: 100%;
   }
   .actions-container {
     position: absolute;
     width: 60%;
     bottom: 20px;
-    left: 20%;
+    right: 20%;
   }
 </style>

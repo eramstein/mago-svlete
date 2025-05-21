@@ -28,6 +28,28 @@ const goTo: () => Tool = () => {
   };
 };
 
+const startGame: () => Tool = () => {
+  return {
+    type: 'function',
+    function: {
+      name: ActionType.StartGame,
+      description: 'Start a game of Hordes cards',
+      parameters: {
+        type: 'object',
+        required: ['opponent'],
+        properties: {
+          opponent: {
+            type: 'string',
+            description:
+              'The other player in the game, one of the characters present at the same place',
+            enum: gs.sim.characters.map((c) => c.name),
+          },
+        },
+      },
+    },
+  };
+};
+
 export function getTools(): Tool[] {
-  return [goTo].map((f) => f());
+  return [goTo, startGame].map((f) => f());
 }

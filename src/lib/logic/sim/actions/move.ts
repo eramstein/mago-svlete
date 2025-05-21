@@ -1,6 +1,6 @@
 import type { Zone, Place, Character, SimState } from '@/lib/model/model-sim';
 
-export function moveFromText(
+export function moveTool(
   sim: SimState,
   character: Character,
   param: {

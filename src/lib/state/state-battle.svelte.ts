@@ -15,7 +15,7 @@ export const initialBattleState: BattleState = {
     },
     {
       id: 1,
-      name: 'The Dude',
+      name: 'Default AI',
       hand: [],
       score: 0,
     },

@@ -7,10 +7,11 @@ import {
 import { playAiTurn } from './ai';
 import { cards } from '@data/cards';
 
-export function initBattle() {
+export function initBattle(opponentName: string = 'Default AI') {
   const state = resetBattleState(initialBattleState);
   initializeBoard(state);
   state.turn = 1;
+  state.players[1].name = opponentName;
   drawCard(state, 0, cards['h_celtic_village']);
   drawCard(state, 0, cards['h_bear_cabin']);
   drawCard(state, 0, cards['h_cursed_forest']);
