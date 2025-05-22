@@ -59,5 +59,5 @@ export const PLACES: Place[] = [
 ].map((p, i) => ({
   index: i,
   ...p,
-  zones: p.zones.map((z, j) => ({ index: j, ...z })),
+  zones: p.zones.map((z, j) => ({ index: j, place: i, ...z })),
 }));

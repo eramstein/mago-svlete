@@ -10,17 +10,12 @@ const goTo: () => Tool = () => {
       description: 'A person going to a different place',
       parameters: {
         type: 'object',
-        required: ['destinationPlace'],
+        required: ['destinationZone'],
         properties: {
-          destinationPlace: {
-            type: 'string',
-            description: 'The destination where the person is going to',
-            enum: gs.sim.places.map((p) => p.name),
-          },
           destinationZone: {
             type: 'string',
             description: 'The zone within the place where the person is going to',
-            enum: gs.sim.places.map((p) => p.zones.map((z) => z.name)).flat(),
+            enum: gs.sim.places.flatMap((p) => p.zones.map((z) => z.name)),
           },
         },
       },

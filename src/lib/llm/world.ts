@@ -5,17 +5,16 @@ export async function initWorldMemory() {
   const collection = await vectorDatabaseClient.getOrCreateCollection({
     name: 'world',
   });
-  const placesDescriptions: string[] = [];
+  const zonesDescriptions: string[] = [];
   PLACES.forEach((place) => {
-    let desc = `${place.name} is a known place in the world. It is ${place.description}. It is composed of the following zones: `;
     place.zones.forEach((zone) => {
-      desc = desc + `- zone ${zone.name}: ${zone.description}. `;
+      const desc = `${zone.name} is a known place in the world. It is part of ${place.name}. It is ${zone.description}. `;
+      zonesDescriptions.push(desc);
     });
-    placesDescriptions.push(desc);
   });
   await collection.upsert({
-    documents: placesDescriptions,
-    ids: placesDescriptions.map((_, i) => 'entry ' + i),
+    documents: zonesDescriptions,
+    ids: zonesDescriptions.map((_, i) => 'entry ' + i),
   });
   console.log("World's memory initalized");
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { actFromText } from '@/lib/logic/sim/actions';
+  import { act } from '@/lib/logic/sim/actions';
   import { getActionFromText } from '@/lib/llm';
   import { gs } from '@/lib/state';
   import { ActionType } from '@/lib/config';
@@ -26,7 +26,7 @@
 
   async function executeAction() {
     if (previewAction) {
-      await actFromText(gs.sim, inputValue, gs.sim.player);
+      await act(gs.sim, previewAction.actionType, previewAction.args, gs.sim.player);
       inputValue = '';
       previewAction = null;
     }

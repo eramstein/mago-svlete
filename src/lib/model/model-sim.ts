@@ -20,6 +20,7 @@ export interface Place {
 export interface Zone {
   index: number;
   name: string;
+  place: number;
   description: string;
   image?: string;
 }

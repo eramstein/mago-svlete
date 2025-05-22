@@ -4,17 +4,13 @@ export function moveTool(
   sim: SimState,
   character: Character,
   param: {
-    destinationPlace: string;
-    destinationZone?: string;
+    destinationZone: string;
   }
 ) {
-  const place = sim.places.find((p) => p.name === param.destinationPlace);
-  if (place) {
-    let zoneId = 0;
-    if (param.destinationZone) {
-      zoneId = place.zones.findIndex((z) => z.name === param.destinationZone) || 0;
-    }
-    move(character, place, place.zones[zoneId]);
+  const zone = sim.places.flatMap((p) => p.zones).find((z) => z.name === param.destinationZone);
+  const place = sim.places.find((p) => p.index === zone?.place);
+  if (place && zone) {
+    move(character, place, zone);
   }
 }
 
