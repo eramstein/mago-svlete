@@ -5,6 +5,8 @@ import type { MessageExpansion } from '@/lib/model/model-llm';
 import { vectorDatabaseClient } from './vector-db';
 import { LLM_MODEL } from './config';
 import { PLAYER_CONFIG } from '@/data/npcs/player';
+import { getActionFromText } from './action';
+import { ACTIONS } from '../logic/sim/action-types';
 
 const SYSTEM_PROMPT_PREFIX = `
   This is a collaborative writing with the user. You are writing a character named 
@@ -16,7 +18,15 @@ const SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS = `
 Return a JSON output describing what your character says and what actions he takes in that interaction. Format:
 {
   "speech": "<what your character says>",
-  "actions": "<what your character does>",
+  "actions": "<what your character does>"
+}
+IMPORTANT: All property values MUST be enclosed in double quotes. 
+Do not use single quotes or omit quotes.
+Don't forget the comma before "actions".
+Example of correct format:
+{
+  "speech": "Hello there!",
+  "actions": "waves hand"
 }
 `;
 
@@ -98,7 +108,7 @@ export async function endChat(character: string) {
 export async function sendMessage(
   characterKey: string,
   message: string,
-  onStream: (chunk: string) => void,
+  onStream: ((chunk: string) => void) | null,
   fromCharacterName: string = PLAYER_CONFIG.name
 ) {
   const messageWithSender = `${fromCharacterName} tells you this: ${message}`;
@@ -120,7 +130,7 @@ export async function sendMessage(
   let fullResponse = '';
   for await (const chunk of stream) {
     fullResponse += chunk.message.content;
-    onStream(chunk.message.content);
+    onStream?.(chunk.message.content);
   }
 
   const startJson = fullResponse.indexOf('{');
@@ -137,6 +147,17 @@ export async function sendMessage(
   });
 }
 
+export async function findActionRequestInMessage(
+  characterKey: string,
+  message: string,
+  fromCharacterName: string = PLAYER_CONFIG.name
+) {
+  const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;
+  const messageWithCharacters = `${fromCharacterName} tells ${characterName} this: ${message}`;
+  const action = await getActionFromText(messageWithCharacters);
+  return action;
+}
+
 export function parseMessage(message: string): MessageExpansion {
   let parsed = {};
   try {
@@ -147,4 +168,43 @@ export function parseMessage(message: string): MessageExpansion {
     };
   }
   return parsed;
+}
+
+export async function checkProposedAction(npcKey: string, message: string) {
+  const proposedAction = await findActionRequestInMessage(npcKey, message);
+  if (!proposedAction) {
+    return null;
+  }
+  const characterName = gs.sim.characters.find((c) => c.key === npcKey)?.name;
+  const npcPrompt =
+    NPCS[npcKey].name +
+    '. ' +
+    SYSTEM_PROMPT_PREFIX_2 +
+    PLAYER_CONFIG.name +
+    '. ' +
+    NPCS[npcKey].systemPrompt;
+  const systemPrompt = {
+    role: 'system',
+    content: `
+      ${SYSTEM_PROMPT_PREFIX} ${npcPrompt}. 
+      You character is proposed an activity.
+      You MUST respond with EXACTLY one of these two words: "YES" or "NO".
+      Do not include any other text, explanations, or punctuation.
+      Just respond with either "YES" or "NO".
+    `,
+  };
+  const actionType = ACTIONS[proposedAction.actionType].description;
+  const proposition = `${characterName} proposes the following activity with you: ${actionType}`;
+  const response = await ollama.chat({
+    model: LLM_MODEL,
+    messages: [systemPrompt, { role: 'user', content: proposition }],
+    options: {
+      temperature: 0.1, // Lower temperature for more deterministic responses
+    },
+  });
+  const answer = response.message.content.trim().toUpperCase();
+  return {
+    answer: answer === 'YES' ? 'YES' : 'NO', // Ensure we only return YES or NO
+    action: proposedAction,
+  };
 }

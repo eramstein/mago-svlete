@@ -1,13 +1,14 @@
 import { gs } from '@/lib/state';
 import type { Tool } from 'ollama';
 import { ActionType } from '../config';
+import { ACTIONS } from '../logic/sim/action-types';
 
 const goTo: () => Tool = () => {
   return {
     type: 'function',
     function: {
       name: ActionType.GoTo,
-      description: 'A person going to a different place',
+      description: ACTIONS[ActionType.GoTo].description,
       parameters: {
         type: 'object',
         required: ['destinationZone'],
@@ -28,7 +29,7 @@ const startGame: () => Tool = () => {
     type: 'function',
     function: {
       name: ActionType.StartGame,
-      description: 'Start a game of Hordes cards',
+      description: ACTIONS[ActionType.StartGame].description,
       parameters: {
         type: 'object',
         required: ['opponent'],

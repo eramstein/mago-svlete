@@ -1,14 +1,17 @@
 <script lang="ts">
   import { PLAYER_CONFIG } from '@/data/npcs/player';
-  import { sendMessage, initChat, endChat } from '@/lib/llm/chat';
+  import { sendMessage, initChat, endChat, checkProposedAction } from '@/lib/llm/chat';
   import { gs } from '@/lib/state';
   import { onMount } from 'svelte';
   import { getCharacterImage } from '../_helpers';
+  import { act } from '@/lib/logic/sim/actions';
+  import { ActionType } from '@/lib/config';
 
   let { npcKey }: { npcKey: string } = $props();
 
   let fullMessage = '';
   let currentMessage = $state('');
+  let proposedAction = $state<{ actionType: ActionType; args: Record<string, any> } | null>(null);
 
   async function sendChat(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -17,13 +20,28 @@
     }
     const message = target.value;
     if (message === 'bye') {
-      endChat('dude');
+      endChat(npcKey);
       return;
     }
     target.value = '';
-    await sendMessage('dude', message, onStream);
+    await sendMessage(npcKey, message, onStream);
     currentMessage = '';
     fullMessage = '';
+    const response = await checkProposedAction(npcKey, message);
+    if (response?.answer === 'YES' && response?.action) {
+      proposedAction = response.action;
+    }
+  }
+
+  async function executeAction() {
+    if (proposedAction) {
+      await act(gs.sim, proposedAction.actionType, proposedAction.args, gs.sim.player);
+      proposedAction = null;
+    }
+  }
+
+  function resetAction() {
+    proposedAction = null;
   }
 
   function onStream(chunk: string) {
@@ -40,7 +58,7 @@
   };
 
   onMount(() => {
-    initChat('dude');
+    initChat(npcKey);
   });
 </script>
 
@@ -57,7 +75,7 @@
         {/if}
         {#if message.actions}
           <div class="chat-bit-action">
-            {message.actions}
+            {'<' + message.actions + '>'}
           </div>
         {/if}
       </div>
@@ -66,6 +84,17 @@
       <div class="chat-bit">
         <strong>{names.assistant}:</strong>
         <div>{currentMessage}</div>
+      </div>
+    {/if}
+    {#if proposedAction && proposedAction.actionType !== ActionType.None}
+      <div class="action-preview">
+        <div class="preview-content">
+          <strong>{proposedAction.actionType}</strong>
+        </div>
+        <div class="preview-buttons">
+          <button onclick={executeAction}>Yep</button>
+          <button class="reset" onclick={resetAction}>Nope</button>
+        </div>
       </div>
     {/if}
   </div>
@@ -115,5 +144,38 @@
   }
   .chat-bit-action {
     font-style: italic;
+  }
+  .action-preview {
+    background: #444;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+  }
+  .preview-content {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  .preview-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  button {
+    padding: 0.5rem 1rem;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  button:hover {
+    background: #45a049;
+  }
+  button.reset {
+    background: #e57373;
+  }
+  button.reset:hover {
+    background: #ef5350;
   }
 </style>

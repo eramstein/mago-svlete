@@ -35,6 +35,7 @@ export interface Character {
 export interface ActionTypeDefinition {
   fn: ActionEffect;
   duration: number;
+  description: string;
 }
 
 export type ActionEffect = (sim: SimState, character: Character, args: any) => void;
