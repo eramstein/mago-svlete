@@ -1,4 +1,10 @@
-import type { Message } from "ollama";
+import type { Message } from 'ollama';
+
+export type ChatState = {
+  chattingWith: string;
+  history: Record<string, ChatHistory>;
+  context: string; // what happens around the conversation
+};
 
 export type CharacterRole = {
   key: string;

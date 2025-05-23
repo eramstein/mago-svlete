@@ -170,11 +170,11 @@ export function getOppositeCell(
     case AttackDirection.Up:
       return position.y > 1 ? state.board[position.x][position.y - 2] : null;
     case AttackDirection.Down:
-      return position.y < config.boardSize - 1 ? state.board[position.x][position.y + 2] : null;
+      return position.y < config.boardSize - 2 ? state.board[position.x][position.y + 2] : null;
     case AttackDirection.Left:
       return position.x > 1 ? state.board[position.x - 2][position.y] : null;
     case AttackDirection.Right:
-      return position.x < config.boardSize - 1 ? state.board[position.x + 2][position.y] : null;
+      return position.x < config.boardSize - 2 ? state.board[position.x + 2][position.y] : null;
     default:
       return null;
   }

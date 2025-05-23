@@ -3,7 +3,7 @@ import {
   OnTurnStart,
   TargetAllies,
   TargetEnemies,
-} from '@lib/logic/battle/ability_shorthands';
+} from '@lib/logic/battle/ability-shorthands';
 import { getFreePositions } from '@lib/logic/battle/board';
 import { damageCard, grantKeyword, heal, mezz, summon } from '@lib/logic/battle/effects';
 import { randomElement } from '@lib/logic/battle/random';

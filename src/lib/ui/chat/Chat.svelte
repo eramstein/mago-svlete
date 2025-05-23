@@ -20,14 +20,14 @@
     }
     const message = target.value;
     if (message === 'bye') {
-      endChat(npcKey);
+      endChat(gs.chat, npcKey);
       return;
     }
     target.value = '';
-    await sendMessage(npcKey, message, onStream);
+    await sendMessage(gs, npcKey, message, onStream);
     currentMessage = '';
     fullMessage = '';
-    const response = await checkProposedAction(npcKey, message);
+    const response = await checkProposedAction(gs, npcKey, message);
     if (response?.answer === 'YES' && response?.action) {
       proposedAction = response.action;
     }
@@ -35,7 +35,7 @@
 
   async function executeAction() {
     if (proposedAction) {
-      await act(gs.sim, proposedAction.actionType, proposedAction.args, gs.sim.player);
+      await act(gs, proposedAction.actionType, proposedAction.args, gs.sim.player);
       proposedAction = null;
     }
   }
@@ -58,7 +58,7 @@
   };
 
   onMount(() => {
-    initChat(npcKey);
+    initChat(gs.chat, npcKey);
   });
 </script>
 

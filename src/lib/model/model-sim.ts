@@ -1,3 +1,5 @@
+import type { State } from './main';
+
 export interface SimState {
   time: Time;
   places: Place[];
@@ -38,4 +40,4 @@ export interface ActionTypeDefinition {
   description: string;
 }
 
-export type ActionEffect = (sim: SimState, character: Character, args: any) => void;
+export type ActionEffect = (gs: State, character: Character, args: any) => void;

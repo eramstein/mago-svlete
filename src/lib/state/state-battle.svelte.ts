@@ -1,6 +1,7 @@
 import { config } from '../config/';
 import type { BattleState } from '../model/model-battle';
 import { gs } from './main.svelte';
+import { PLAYER_CONFIG } from '@/data/npcs/player';
 
 export const initialBattleState: BattleState = {
   turn: 0,
@@ -9,7 +10,7 @@ export const initialBattleState: BattleState = {
   players: [
     {
       id: 0,
-      name: 'Henry',
+      name: PLAYER_CONFIG.name,
       hand: [],
       score: 0,
     },

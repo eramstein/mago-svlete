@@ -8,14 +8,13 @@ export const baseCards: Record<string, Omit<CardTemplate, 'cost'>> = {
   ...cardsHibernia,
 };
 
-// TEMP: for now we compute the cost on the fly, but we set it manually directly in data
+// TEMP: for now we compute the cost on the fly, but we should set it manually directly in data
 export const cards: Record<string, CardTemplate> = {};
 
 Object.entries(baseCards).forEach(([id, card]) => {
   cards[id] = {
     ...card,
-    cost: estimateCardCost(card as Card),
+    //cost: estimateCardCost(card as Card),
+    cost: 0,
   };
 });
-
-console.log(Object.entries(cards).map(([id, card]) => `${id}: ${card.cost}`));

@@ -26,7 +26,7 @@
       <div
         style="background-image: url({getCharacterImage(character.key)})"
         class="character"
-        onclick={() => initChat(character.key)}
+        onclick={() => initChat(gs.chat, character.key)}
       ></div>
     {/each}
   </div>

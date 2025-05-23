@@ -8,14 +8,17 @@
   import Board from './Board.svelte';
   import { cancelCardSelected } from '../_helpers';
   import { gs } from '@lib/state/main.svelte';
+  import { resetContext } from '@lib/llm/context';
 
   function playAgain() {
     resetBattleState(initialBattleState);
     initBattle();
+    resetContext(gs.chat);
   }
 
   function stopPlaying() {
     resetBattleState(initialBattleState);
+    resetContext(gs.chat);
   }
 </script>
 

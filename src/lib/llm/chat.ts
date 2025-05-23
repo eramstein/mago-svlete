@@ -1,12 +1,13 @@
 import ollama from 'ollama';
 import { NPC_DUDE, NPCS } from '@/data/npcs';
-import { gs } from '@/lib/state';
-import type { MessageExpansion } from '@/lib/model/model-llm';
+import type { ChatState, MessageExpansion } from '@/lib/model/model-llm';
 import { vectorDatabaseClient } from './vector-db';
 import { LLM_MODEL } from './config';
 import { PLAYER_CONFIG } from '@/data/npcs/player';
 import { getActionFromText } from './action';
 import { ACTIONS } from '../logic/sim/action-types';
+import type { SimState } from '../model';
+import type { State } from '../model/main';
 
 const SYSTEM_PROMPT_PREFIX = `
   This is a collaborative writing with the user. You are writing a character named 
@@ -29,9 +30,12 @@ Example of correct format:
   "actions": "waves hand"
 }
 `;
+const CONTEXT_PREFIX = `
+  For context, this is what is happening around your character: 
+`;
 
-export async function initNpcMemory() {
-  gs.sim.characters.forEach(async (character) => {
+export async function initNpcMemory(sim: SimState) {
+  sim.characters.forEach(async (character) => {
     const collection = await vectorDatabaseClient.getOrCreateCollection({
       name: character.key,
     });
@@ -69,7 +73,11 @@ async function addNpcMemory(characterKey: string, message: string) {
   });
 }
 
-export function initChat(character: string, fromCharacterName: string = PLAYER_CONFIG.name) {
+export function initChat(
+  chat: ChatState,
+  character: string,
+  fromCharacterName: string = PLAYER_CONFIG.name
+) {
   const npcPrompt =
     NPCS[character].name +
     '. ' +
@@ -77,17 +85,17 @@ export function initChat(character: string, fromCharacterName: string = PLAYER_C
     fromCharacterName +
     '. ' +
     NPCS[character].systemPrompt;
-  gs.chat.history[character] = [
+  chat.history[character] = [
     {
       role: 'system',
       content: SYSTEM_PROMPT_PREFIX + npcPrompt + SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS,
     },
   ];
-  gs.chat.chattingWith = character;
+  chat.chattingWith = character;
 }
 
-export async function endChat(character: string) {
-  const messages = gs.chat.history[character]
+export async function endChat(chat: ChatState, character: string) {
+  const messages = chat.history[character]
     .filter((c) => c.role !== 'system')
     .map((c) => c.character + ': ' + c.speech || '')
     .join(' \n');
@@ -101,11 +109,13 @@ export async function endChat(character: string) {
     messages: [{ role: 'user', content: promptPrefix + messages }],
   });
   addNpcMemory(character, memory.message.content);
-  delete gs.chat.history[character];
-  gs.chat.chattingWith = '';
+  delete chat.history[character];
+  chat.chattingWith = '';
+  chat.context = '';
 }
 
 export async function sendMessage(
+  gs: State,
   characterKey: string,
   message: string,
   onStream: ((chunk: string) => void) | null,
@@ -113,9 +123,10 @@ export async function sendMessage(
 ) {
   const messageWithSender = `${fromCharacterName} tells you this: ${message}`;
   const memoryPrompt = await queryNpcMemory(characterKey, messageWithSender);
+  const contextPrompt = CONTEXT_PREFIX + gs.chat.context;
   gs.chat.history[characterKey].push({
     role: 'user',
-    content: `${memoryPrompt}. ${messageWithSender}`,
+    content: `${contextPrompt}. ${memoryPrompt}. ${messageWithSender}`,
     speech: message,
     character: fromCharacterName,
   });
@@ -148,6 +159,7 @@ export async function sendMessage(
 }
 
 export async function findActionRequestInMessage(
+  gs: State,
   characterKey: string,
   message: string,
   fromCharacterName: string = PLAYER_CONFIG.name
@@ -170,8 +182,8 @@ export function parseMessage(message: string): MessageExpansion {
   return parsed;
 }
 
-export async function checkProposedAction(npcKey: string, message: string) {
-  const proposedAction = await findActionRequestInMessage(npcKey, message);
+export async function checkProposedAction(gs: State, npcKey: string, message: string) {
+  const proposedAction = await findActionRequestInMessage(gs, npcKey, message);
   if (!proposedAction) {
     return null;
   }

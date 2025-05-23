@@ -1,16 +1,18 @@
 import { getActionFromText } from '@/lib/llm';
-import type { Character, SimState } from '@/lib/model/model-sim';
+import type { Character } from '@/lib/model/model-sim';
+import type { State } from '@/lib/model/main';
 import { ACTIONS } from './action-types';
 import { passTime } from './time';
 import type { ActionType } from '@/lib/config';
+import { addContextForAction } from '@/lib/llm/context';
 
-export async function actFromText(sim: SimState, actionText: string, character?: Character) {
+export async function actFromText(gs: State, actionText: string, character?: Character) {
   const { actionType, args } = await getActionFromText(actionText);
-  await act(sim, actionType, args, character);
+  await act(gs, actionType, args, character);
 }
 
 export async function act(
-  sim: SimState,
+  gs: State,
   actionType: ActionType,
   args: Record<string, any>,
   character?: Character
@@ -19,8 +21,8 @@ export async function act(
   if (!action) {
     console.log('No action found for tool ' + actionType);
   }
-  const actingCharacter = character || sim.player;
-  console.log('actFromText', actingCharacter, actionType, args);
-  action.fn(sim, actingCharacter, args);
-  passTime(sim, action.duration);
+  const actingCharacter = character || gs.sim.player;
+  action.fn(gs, actingCharacter, args);
+  addContextForAction(gs.chat, actionType);
+  passTime(gs.sim, action.duration);
 }

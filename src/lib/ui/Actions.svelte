@@ -26,7 +26,7 @@
 
   async function executeAction() {
     if (previewAction) {
-      await act(gs.sim, previewAction.actionType, previewAction.args, gs.sim.player);
+      await act(gs, previewAction.actionType, previewAction.args, gs.sim.player);
       inputValue = '';
       previewAction = null;
     }

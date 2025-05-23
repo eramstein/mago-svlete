@@ -5,6 +5,7 @@
   import { handleKeybinds } from './lib/ui/_keybinds/keybinds';
   import { loadCardImages } from './lib/ui/_helpers';
   import { loadStateFromLocalStorage } from './lib/state/main.svelte';
+  import { initBattleContext } from './lib/llm/battle-context.svelte';
 
   onMount(() => {
     loadCardImages();
@@ -15,6 +16,9 @@
     if (loadedState) {
       console.log('Game state loaded from localStorage');
     }
+
+    // Add some watchers to inform the LLM module about battle state without adding dependencies to the battle module
+    initBattleContext();
   });
 
   onDestroy(() => {

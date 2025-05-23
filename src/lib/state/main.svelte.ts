@@ -9,6 +9,7 @@ const initialState: State = $state({
   chat: {
     chattingWith: '',
     history: {},
+    context: '',
   },
 });
 

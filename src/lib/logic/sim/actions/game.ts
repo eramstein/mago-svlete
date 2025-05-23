@@ -1,18 +1,19 @@
-import type { Character, SimState } from '@/lib/model/model-sim';
+import type { Character } from '@/lib/model/model-sim';
+import type { State } from '@/lib/model/main';
 import { initBattle } from '@/lib/logic/battle/battle';
 import { initChat } from '@/lib/llm/chat';
 
 export function startGameTool(
-  sim: SimState,
+  gs: State,
   character: Character,
   param: {
     opponent: string;
   }
 ) {
-  const opponent = sim.characters.find((c) => c.name === param.opponent);
+  const opponent = gs.sim.characters.find((c) => c.name === param.opponent);
   if (opponent) {
     initBattle(opponent.name);
-    initChat(opponent.key);
+    initChat(gs.chat, opponent.key);
   } else {
     console.log('No opponent found', param);
   }
