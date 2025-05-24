@@ -14,7 +14,8 @@ export const cards: Record<string, CardTemplate> = {};
 Object.entries(baseCards).forEach(([id, card]) => {
   cards[id] = {
     ...card,
-    //cost: estimateCardCost(card as Card),
-    cost: 0,
+    cost: estimateCardCost(card as Card),
+    //cost: 0,
   };
 });
+console.log(cards);

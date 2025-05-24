@@ -1,10 +1,10 @@
-import { getActionFromText } from '@/lib/llm';
+import { getActionFromText, reactToContextChange } from '@/lib/llm';
 import type { Character } from '@/lib/model/model-sim';
 import type { State } from '@/lib/model/main';
 import { ACTIONS } from './action-types';
 import { passTime } from './time';
 import type { ActionType } from '@/lib/config';
-import { addContextForAction } from '@/lib/llm/context';
+import { triggerReactionsOnAction } from '@/lib/llm/context';
 
 export async function actFromText(gs: State, actionText: string, character?: Character) {
   const { actionType, args } = await getActionFromText(actionText);
@@ -23,6 +23,6 @@ export async function act(
   }
   const actingCharacter = character || gs.sim.player;
   action.fn(gs, actingCharacter, args);
-  addContextForAction(gs.chat, actionType);
+  triggerReactionsOnAction(gs, actingCharacter, actionType);
   passTime(gs.sim, action.duration);
 }

@@ -144,10 +144,7 @@ export async function sendMessage(
     onStream?.(chunk.message.content);
   }
 
-  const startJson = fullResponse.indexOf('{');
-  if (startJson !== -1) {
-    fullResponse = fullResponse.substring(startJson);
-  }
+  fullResponse = extractJsonFromMessage(fullResponse);
 
   const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;
   gs.chat.history[characterKey].push({
@@ -170,7 +167,7 @@ export async function findActionRequestInMessage(
   return action;
 }
 
-export function parseMessage(message: string): MessageExpansion {
+function parseMessage(message: string): MessageExpansion {
   let parsed = {};
   try {
     parsed = JSON.parse(message);
@@ -180,6 +177,14 @@ export function parseMessage(message: string): MessageExpansion {
     };
   }
   return parsed;
+}
+
+function extractJsonFromMessage(message: string): string {
+  const startJson = message.indexOf('{');
+  if (startJson !== -1) {
+    return message.substring(startJson);
+  }
+  return '';
 }
 
 export async function checkProposedAction(gs: State, npcKey: string, message: string) {
@@ -219,4 +224,31 @@ export async function checkProposedAction(gs: State, npcKey: string, message: st
     answer: answer === 'YES' ? 'YES' : 'NO', // Ensure we only return YES or NO
     action: proposedAction,
   };
+}
+
+export async function reactToContextChange(gs: State, characterKey: string, newContext: string) {
+  const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;
+
+  if (!gs.chat.history[characterKey]) {
+    initChat(gs.chat, characterKey);
+  }
+
+  const message = {
+    role: 'user',
+    content: `The following just happened: ${newContext}. How does your character react to this?`,
+  };
+
+  const reaction = await ollama.chat({
+    model: LLM_MODEL,
+    messages: [...gs.chat.history[characterKey], message],
+  });
+
+  const reactionJson = extractJsonFromMessage(reaction.message.content);
+
+  gs.chat.history[characterKey].push({
+    role: 'assistant',
+    content: reactionJson,
+    character: characterName,
+    ...parseMessage(reactionJson),
+  });
 }
