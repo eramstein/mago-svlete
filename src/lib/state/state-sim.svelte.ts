@@ -2,6 +2,7 @@ import { PLAYER_CONFIG } from '@/data/npcs/player';
 import type { SimState } from '../model/model-sim';
 import { NPC_DUDE } from '@/data/npcs/dude';
 import { PLACES } from '@/data/world/places';
+import { NPC_MOLLY } from '@/data/npcs/molly';
 
 export const initialSimState: SimState = {
   time: {
@@ -13,6 +14,12 @@ export const initialSimState: SimState = {
     {
       key: NPC_DUDE.key,
       name: NPC_DUDE.name,
+      place: 1,
+      zone: 0,
+    },
+    {
+      key: NPC_MOLLY.key,
+      name: NPC_MOLLY.name,
       place: 1,
       zone: 0,
     },

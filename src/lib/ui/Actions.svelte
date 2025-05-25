@@ -14,7 +14,11 @@
   async function handleInputKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter') {
       if (previewAction) {
-        await executeAction();
+        if (previewAction.actionType !== ActionType.None) {
+          await executeAction();
+        } else {
+          previewAction = null;
+        }
       } else {
         const actionText = inputValue.trim();
         previewAction = await getActionFromText(actionText);

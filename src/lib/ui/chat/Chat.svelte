@@ -1,8 +1,7 @@
 <script lang="ts">
   import { PLAYER_CONFIG } from '@/data/npcs/player';
-  import { sendMessage, initChat, endChat, checkProposedAction } from '@/lib/llm/chat';
+  import { sendMessage, endChat, checkProposedAction } from '@/lib/llm/chat';
   import { gs } from '@/lib/state';
-  import { onMount } from 'svelte';
   import { getCharacterImage } from '../_helpers';
   import { act } from '@/lib/logic/sim/actions';
   import { ActionType } from '@/lib/config';
@@ -12,6 +11,19 @@
   let fullMessage = '';
   let currentMessage = $state('');
   let proposedAction = $state<{ actionType: ActionType; args: Record<string, any> } | null>(null);
+  let chatHistoryElement: HTMLDivElement;
+
+  function scrollToBottom() {
+    if (chatHistoryElement) {
+      chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+    }
+  }
+
+  $effect(() => {
+    if (currentMessage || gs.chat.history[npcKey]) {
+      scrollToBottom();
+    }
+  });
 
   async function sendChat(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -56,18 +68,14 @@
     user: PLAYER_CONFIG.name,
     assistant: gs.sim.characters.find((c) => c.key === npcKey)?.name || npcKey,
   };
-
-  onMount(() => {
-    initChat(gs.chat, npcKey);
-  });
 </script>
 
 <div class="chat-container">
   <div class="portrait-container">
     <div class="portrait" style="background-image: url({getCharacterImage(npcKey)})"></div>
   </div>
-  <div id="chat-history" class="chat-history">
-    {#each gs.chat.history[npcKey]?.filter((m) => m.role !== 'system') as message, i}
+  <div id="chat-history" class="chat-history" bind:this={chatHistoryElement}>
+    {#each gs.chat.history[npcKey]?.filter((m) => m.role !== 'system') as message}
       <div class="chat-bit">
         <strong>{names[message.role]}:</strong>
         {#if message.speech}

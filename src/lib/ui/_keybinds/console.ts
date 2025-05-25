@@ -13,4 +13,7 @@ export const consoleCommands = {
   listcollections: () => {
     listCollections();
   },
+  l: () => {
+    console.log(JSON.stringify(gs, null, 2));
+  },
 };

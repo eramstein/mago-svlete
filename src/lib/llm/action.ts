@@ -13,7 +13,7 @@ async function getToolsFromText(message: string) {
   };
   const query = {
     role: 'user',
-    content: memoryPrompt + message,
+    content: `This is the key information to select the tool, give it priority: ${message}. ${memoryPrompt}`,
   };
   const response = await ollama.chat({
     model: LLM_MODEL,

@@ -1,5 +1,5 @@
 import ollama from 'ollama';
-import { NPC_DUDE, NPCS } from '@/data/npcs';
+import { NPCS } from '@/data/npcs';
 import type { ChatState, MessageExpansion } from '@/lib/model/model-llm';
 import { vectorDatabaseClient } from './vector-db';
 import { LLM_MODEL } from './config';
@@ -40,8 +40,8 @@ export async function initNpcMemory(sim: SimState) {
       name: character.key,
     });
     await collection.upsert({
-      documents: NPC_DUDE.initialMemories,
-      ids: NPC_DUDE.initialMemories.map((_, i) => character.key + ' memory ' + i),
+      documents: NPCS[character.key].initialMemories,
+      ids: NPCS[character.key].initialMemories.map((_, i) => character.key + ' memory ' + i),
     });
   });
   console.log('NPCs memory initalized');
@@ -73,6 +73,14 @@ async function addNpcMemory(characterKey: string, message: string) {
   });
 }
 
+export function chatWithNpc(chat: ChatState, character: string) {
+  chat.chattingWith = character;
+  if (chat.history[character]) {
+    return;
+  }
+  initChat(chat, character);
+}
+
 export function initChat(
   chat: ChatState,
   character: string,
@@ -91,7 +99,6 @@ export function initChat(
       content: SYSTEM_PROMPT_PREFIX + npcPrompt + SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS,
     },
   ];
-  chat.chattingWith = character;
 }
 
 export async function endChat(chat: ChatState, character: string) {

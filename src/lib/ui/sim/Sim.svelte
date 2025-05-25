@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gs } from '@/lib/state/main.svelte';
   import { getCharacterImage, getPlaceImage } from '../_helpers';
-  import { initChat } from '@/lib/llm';
+  import { chatWithNpc } from '@/lib/llm';
 
   const currentZone = $derived(gs.sim.places[gs.sim.player.place].zones[gs.sim.player.zone]);
   const presentCharacters = $derived(
@@ -26,7 +26,7 @@
       <div
         style="background-image: url({getCharacterImage(character.key)})"
         class="character"
-        onclick={() => initChat(gs.chat, character.key)}
+        onclick={() => chatWithNpc(gs.chat, character.key)}
       ></div>
     {/each}
   </div>

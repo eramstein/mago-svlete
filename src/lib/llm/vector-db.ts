@@ -17,5 +17,6 @@ export async function listCollections() {
       name: collectionName,
     });
   });
+  console.log(collections);
   return collections;
 }
