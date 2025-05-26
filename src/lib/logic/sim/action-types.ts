@@ -12,7 +12,7 @@ export const ACTIONS: Record<string, ActionTypeDefinition> = {
   [ActionType.StartGame]: {
     fn: startGameTool,
     duration: 10,
-    description: 'Start a game of Hordes cards',
+    description: 'Start a game of Hordes cards.',
   },
   [ActionType.None]: {
     fn: () => {},

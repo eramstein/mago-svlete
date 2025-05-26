@@ -1,6 +1,6 @@
 import ollama from 'ollama';
 import { NPCS } from '@/data/npcs';
-import type { ChatState, MessageExpansion } from '@/lib/model/model-llm';
+import type { ChatState, DecodedMessage, MessageExpansion } from '@/lib/model/model-llm';
 import { vectorDatabaseClient } from './vector-db';
 import { LLM_MODEL } from './config';
 import { PLAYER_CONFIG } from '@/data/npcs/player';
@@ -21,6 +21,7 @@ Return a JSON output describing what your character says and what actions he tak
   "speech": "<what your character says>",
   "actions": "<what your character does>"
 }
+Return only ONE such object. Do not return multiple objects.
 IMPORTANT: All property values MUST be enclosed in double quotes. 
 Do not use single quotes or omit quotes.
 Don't forget the comma before "actions".
@@ -58,6 +59,7 @@ async function queryNpcMemory(characterKey: string, message: string) {
   if (!results.documents.length) {
     return '';
   }
+  console.log('queryNpcMemory', characterKey, message, results.documents[0]);
   return 'The following memory is relevant: ' + results.documents[0] + '. ';
 }
 
@@ -125,18 +127,27 @@ export async function sendMessage(
   gs: State,
   characterKey: string,
   message: string,
+  isSpeech: boolean = true,
   onStream: ((chunk: string) => void) | null,
   fromCharacterName: string = PLAYER_CONFIG.name
 ) {
   const messageWithSender = `${fromCharacterName} tells you this: ${message}`;
   const memoryPrompt = await queryNpcMemory(characterKey, messageWithSender);
   const contextPrompt = CONTEXT_PREFIX + gs.chat.context;
-  gs.chat.history[characterKey].push({
+
+  const messageObject: DecodedMessage = {
     role: 'user',
     content: `${contextPrompt}. ${memoryPrompt}. ${messageWithSender}`,
-    speech: message,
     character: fromCharacterName,
-  });
+  };
+
+  if (isSpeech) {
+    messageObject.speech = message;
+  } else {
+    messageObject.actions = message;
+  }
+
+  gs.chat.history[characterKey].push(messageObject);
 
   // Use streaming API
   const stream = await ollama.chat({
@@ -189,7 +200,8 @@ function parseMessage(message: string): MessageExpansion {
 function extractJsonFromMessage(message: string): string {
   const startJson = message.indexOf('{');
   if (startJson !== -1) {
-    return message.substring(startJson);
+    const json = message.substring(startJson);
+    return json.endsWith('}') ? json : json + '}';
   }
   return '';
 }
@@ -199,7 +211,6 @@ export async function checkProposedAction(gs: State, npcKey: string, message: st
   if (!proposedAction) {
     return null;
   }
-  const characterName = gs.sim.characters.find((c) => c.key === npcKey)?.name;
   const npcPrompt =
     NPCS[npcKey].name +
     '. ' +
@@ -218,7 +229,7 @@ export async function checkProposedAction(gs: State, npcKey: string, message: st
     `,
   };
   const actionType = ACTIONS[proposedAction.actionType].description;
-  const proposition = `${characterName} proposes the following activity with you: ${actionType}`;
+  const proposition = `${PLAYER_CONFIG.name} proposes the following activity with you: ${actionType}`;
   const response = await ollama.chat({
     model: LLM_MODEL,
     messages: [systemPrompt, { role: 'user', content: proposition }],

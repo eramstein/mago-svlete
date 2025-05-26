@@ -10,6 +10,8 @@
 
   let fullMessage = '';
   let currentMessage = $state('');
+  let fullAction = '';
+  let currentAction = $state('');
   let proposedAction = $state<{ actionType: ActionType; args: Record<string, any> } | null>(null);
   let chatHistoryElement: HTMLDivElement;
 
@@ -20,7 +22,7 @@
   }
 
   $effect(() => {
-    if (currentMessage || gs.chat.history[npcKey]) {
+    if (currentMessage || currentAction || gs.chat.history[npcKey]) {
       scrollToBottom();
     }
   });
@@ -36,13 +38,25 @@
       return;
     }
     target.value = '';
-    await sendMessage(gs, npcKey, message, onStream);
+    await sendMessage(gs, npcKey, message, true, onStream);
     currentMessage = '';
     fullMessage = '';
     const response = await checkProposedAction(gs, npcKey, message);
     if (response?.answer === 'YES' && response?.action) {
       proposedAction = response.action;
     }
+  }
+
+  async function actionChat(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (!target) {
+      return;
+    }
+    const action = target.value;
+    target.value = '';
+    await sendMessage(gs, npcKey, action, false, onStreamAction);
+    currentAction = '';
+    fullAction = '';
   }
 
   async function executeAction() {
@@ -61,6 +75,14 @@
     // this is trick to display text only after the speech JSON property is set in the response
     if (fullMessage.includes(': "')) {
       currentMessage += chunk;
+    }
+  }
+
+  function onStreamAction(chunk: string) {
+    fullAction += chunk;
+    // this is trick to display text only after the speech JSON property is set in the response
+    if (fullAction.includes(': "')) {
+      currentAction += chunk;
     }
   }
 
@@ -94,6 +116,12 @@
         <div>{currentMessage}</div>
       </div>
     {/if}
+    {#if currentAction}
+      <div class="chat-bit">
+        <strong>{names.assistant}:</strong>
+        <div>{currentAction}</div>
+      </div>
+    {/if}
     {#if proposedAction && proposedAction.actionType !== ActionType.None}
       <div class="action-preview">
         <div class="preview-content">
@@ -106,7 +134,14 @@
       </div>
     {/if}
   </div>
-  <input class="chat-input" type="text" onchange={sendChat} />
+  <div class="input-container">
+    <span class="input-icon">💬</span>
+    <input class="chat-input" type="text" onchange={sendChat} placeholder="Type your message..." />
+  </div>
+  <div class="input-container">
+    <span class="input-icon">👋</span>
+    <input class="chat-input" type="text" onchange={actionChat} placeholder="Type your action..." />
+  </div>
 </div>
 
 <style>
@@ -141,10 +176,17 @@
   .chat-history::-webkit-scrollbar {
     display: none;
   }
+  .input-container {
+    display: flex;
+    align-items: center;
+    margin: 0 10px 10px 5px;
+    gap: 8px;
+  }
+  .input-icon {
+    font-size: 1.2rem;
+  }
   .chat-input {
-    width: 265px;
-    margin-left: 10px;
-    margin-bottom: 10px;
+    width: 100%;
     height: 20px;
   }
   .chat-bit {

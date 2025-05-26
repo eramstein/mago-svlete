@@ -12,6 +12,7 @@ import { playDeploySound } from '@lib/sounds';
 import { setPlayerScores } from './victory';
 import { triggerAbilities } from './abilities';
 import { AbilityTrigger } from '@lib/config/enums-battle';
+import { chatOnCardEntered } from '@/lib/llm/battle-context.svelte';
 
 export function drawCard(state: BattleState, playerId: number, cardTemplate: CardTemplate) {
   const card = { ...cardTemplate, instanceId: crypto.randomUUID(), ownerId: playerId };
@@ -35,6 +36,7 @@ export function deployCard(state: BattleState, card: Card, position: Position) {
   setPlayerScores(state);
   playDeploySound();
   if (!card.summoned) {
+    chatOnCardEntered(deployedCard);
     passTurn(state);
   }
 }

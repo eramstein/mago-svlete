@@ -20,3 +20,39 @@ export async function listCollections() {
   console.log(collections);
   return collections;
 }
+
+export async function listCollectionsWithContent() {
+  const collections = await vectorDatabaseClient.listCollections();
+  const collectionsWithContent = await Promise.all(
+    collections.map(async (collectionName) => {
+      const collection = await vectorDatabaseClient.getOrCreateCollection({
+        name: collectionName,
+      });
+      const count = await collection.count();
+
+      // Get the last 5 items (or fewer if collection has less)
+      const limit = Math.min(5, count);
+      const lastItems =
+        count > 0
+          ? await collection.get({
+              limit,
+              offset: count - limit,
+            })
+          : null;
+
+      return {
+        name: collectionName,
+        count,
+        lastItems: lastItems
+          ? {
+              ids: lastItems.ids,
+              documents: lastItems.documents,
+              metadatas: lastItems.metadatas,
+            }
+          : null,
+      };
+    })
+  );
+  console.log('Collections with content:', collectionsWithContent);
+  return collectionsWithContent;
+}

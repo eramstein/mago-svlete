@@ -1,3 +1,4 @@
+import { chatOnBattleWon } from '@/lib/llm/battle-context.svelte';
 import type { BattleState } from '@lib/model/model-battle';
 
 export function computeWinner(state: BattleState) {
@@ -7,6 +8,7 @@ export function computeWinner(state: BattleState) {
   const winner = state.players.sort((a, b) => b.score - a.score)[0];
   if (winner) {
     state.wonByPlayerId = winner.id;
+    chatOnBattleWon();
   }
 }
 

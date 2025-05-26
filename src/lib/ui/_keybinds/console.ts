@@ -1,4 +1,4 @@
-import { initNpcMemory, listCollections, resetVectorDatabase } from '@/lib/llm';
+import { initNpcMemory, listCollectionsWithContent, resetVectorDatabase } from '@/lib/llm';
 import { initWorldMemory } from '@/lib/llm/world';
 import { gs } from '@/lib/state';
 
@@ -11,7 +11,7 @@ export const consoleCommands = {
     resetVectorDatabase();
   },
   listcollections: () => {
-    listCollections();
+    listCollectionsWithContent();
   },
   l: () => {
     console.log(JSON.stringify(gs, null, 2));
