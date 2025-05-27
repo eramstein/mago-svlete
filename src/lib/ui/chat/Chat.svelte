@@ -3,7 +3,7 @@
   import { sendMessage, endChat, checkProposedAction } from '@/lib/llm/chat';
   import { gs } from '@/lib/state';
   import { getCharacterImage } from '../_helpers';
-  import { act } from '@/lib/logic/sim/actions';
+  import { act, jointAction } from '@/lib/logic/sim/actions';
   import { ActionType } from '@/lib/config';
 
   let { npcKey }: { npcKey: string } = $props();
@@ -27,7 +27,7 @@
     }
   });
 
-  async function sendChat(e: Event) {
+  async function sendChat(e: Event, includesActionProposal: boolean = false) {
     const target = e.target as HTMLInputElement;
     if (!target) {
       return;
@@ -41,9 +41,12 @@
     await sendMessage(gs, npcKey, message, true, onStream);
     currentMessage = '';
     fullMessage = '';
-    const response = await checkProposedAction(gs, npcKey, message);
-    if (response?.answer === 'YES' && response?.action) {
-      proposedAction = response.action;
+    if (includesActionProposal) {
+      const response = await checkProposedAction(gs, npcKey, message);
+      console.log('includesActionProposal', response);
+      if (response?.answer === 'YES' && response?.action) {
+        proposedAction = response.action;
+      }
     }
   }
 
@@ -61,7 +64,14 @@
 
   async function executeAction() {
     if (proposedAction) {
-      await act(gs, proposedAction.actionType, proposedAction.args, gs.sim.player);
+      const actingWith = gs.sim.characters.find((c) => c.key === npcKey);
+      if (!actingWith) {
+        return;
+      }
+      await jointAction(gs, proposedAction.actionType, proposedAction.args, [
+        actingWith,
+        gs.sim.player,
+      ]);
       proposedAction = null;
     }
   }
@@ -126,6 +136,7 @@
       <div class="action-preview">
         <div class="preview-content">
           <strong>{proposedAction.actionType}</strong>
+          {JSON.stringify(proposedAction.args)}
         </div>
         <div class="preview-buttons">
           <button onclick={executeAction}>Yep</button>
@@ -133,6 +144,15 @@
         </div>
       </div>
     {/if}
+  </div>
+  <div class="input-container">
+    <span class="input-icon">🤝</span>
+    <input
+      class="chat-input"
+      type="text"
+      onchange={(e) => sendChat(e, true)}
+      placeholder="Propose a common action..."
+    />
   </div>
   <div class="input-container">
     <span class="input-icon">💬</span>

@@ -2,12 +2,14 @@ import ollama from 'ollama';
 import { NPCS } from '@/data/npcs';
 import type { ChatState, DecodedMessage, MessageExpansion } from '@/lib/model/model-llm';
 import { vectorDatabaseClient } from './vector-db';
-import { LLM_MODEL } from './config';
+import { LLM_MODEL, LLM_MODEL_TOOLS } from './config';
 import { PLAYER_CONFIG } from '@/data/npcs/player';
 import { getActionFromText } from './action';
 import { ACTIONS } from '../logic/sim/action-types';
 import type { SimState } from '../model';
 import type { State } from '../model/main';
+import { addContextFromLocation, getFullContextString, resetContext } from './context';
+import { gs } from '../state/main.svelte';
 
 const SYSTEM_PROMPT_PREFIX = `
   This is a collaborative writing with the user. You are writing a character named 
@@ -101,6 +103,7 @@ export function initChat(
       content: SYSTEM_PROMPT_PREFIX + npcPrompt + SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS,
     },
   ];
+  addContextFromLocation(gs, character);
 }
 
 export async function endChat(chat: ChatState, character: string) {
@@ -120,7 +123,7 @@ export async function endChat(chat: ChatState, character: string) {
   addNpcMemory(character, memory.message.content);
   delete chat.history[character];
   chat.chattingWith = '';
-  chat.context = '';
+  resetContext(chat);
 }
 
 export async function sendMessage(
@@ -133,7 +136,7 @@ export async function sendMessage(
 ) {
   const messageWithSender = `${fromCharacterName} tells you this: ${message}`;
   const memoryPrompt = await queryNpcMemory(characterKey, messageWithSender);
-  const contextPrompt = CONTEXT_PREFIX + gs.chat.context;
+  const contextPrompt = CONTEXT_PREFIX + getFullContextString(gs.chat);
 
   const messageObject: DecodedMessage = {
     role: 'user',
@@ -198,9 +201,16 @@ function parseMessage(message: string): MessageExpansion {
 }
 
 function extractJsonFromMessage(message: string): string {
+  console.log('extractJsonFromMessage', message);
   const startJson = message.indexOf('{');
   if (startJson !== -1) {
-    const json = message.substring(startJson);
+    const json = message
+      .substring(startJson)
+      .trim()
+      .replace(/, }/, '}')
+      .replace(/^```json\n/, '')
+      .replace(/\n```$/, '');
+    console.log('extractJsonFromMessage', json);
     return json.endsWith('}') ? json : json + '}';
   }
   return '';
@@ -211,28 +221,20 @@ export async function checkProposedAction(gs: State, npcKey: string, message: st
   if (!proposedAction) {
     return null;
   }
-  const npcPrompt =
-    NPCS[npcKey].name +
-    '. ' +
-    SYSTEM_PROMPT_PREFIX_2 +
-    PLAYER_CONFIG.name +
-    '. ' +
-    NPCS[npcKey].systemPrompt;
   const systemPrompt = {
-    role: 'system',
+    role: 'assistant',
     content: `
-      ${SYSTEM_PROMPT_PREFIX} ${npcPrompt}. 
-      You character is proposed an activity.
+      Is the following message a yes or no answer to the proposed action?
+      ${gs.chat.history[npcKey].slice(-1)[0].content}
       You MUST respond with EXACTLY one of these two words: "YES" or "NO".
+      Always give an answer.
       Do not include any other text, explanations, or punctuation.
       Just respond with either "YES" or "NO".
     `,
   };
-  const actionType = ACTIONS[proposedAction.actionType].description;
-  const proposition = `${PLAYER_CONFIG.name} proposes the following activity with you: ${actionType}`;
   const response = await ollama.chat({
-    model: LLM_MODEL,
-    messages: [systemPrompt, { role: 'user', content: proposition }],
+    model: LLM_MODEL_TOOLS,
+    messages: [systemPrompt],
     options: {
       temperature: 0.1, // Lower temperature for more deterministic responses
     },

@@ -3,7 +3,11 @@ import type { Message } from 'ollama';
 export type ChatState = {
   chattingWith: string;
   history: Record<string, ChatHistory>;
-  context: string; // what happens around the conversation
+  context: {
+    place: string;
+    people: string;
+    game: string;
+  }; // what happens around the conversation
 };
 
 export type CharacterRole = {

@@ -13,7 +13,9 @@ export function startGameTool(
   const opponent = gs.sim.characters.find((c) => c.name === param.opponent);
   if (opponent) {
     initBattle(opponent.name);
-    initChat(gs.chat, opponent.key);
+    if (!gs.chat.history[opponent.key]) {
+      initChat(gs.chat, opponent.key);
+    }
   } else {
     console.log('No opponent found', param);
   }

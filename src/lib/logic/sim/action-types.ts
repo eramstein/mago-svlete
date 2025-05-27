@@ -7,7 +7,7 @@ export const ACTIONS: Record<string, ActionTypeDefinition> = {
   [ActionType.GoTo]: {
     fn: moveTool,
     duration: 30,
-    description: 'Move to a different place',
+    description: 'Go somewhere',
   },
   [ActionType.StartGame]: {
     fn: startGameTool,
