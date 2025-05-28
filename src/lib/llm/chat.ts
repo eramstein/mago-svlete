@@ -51,18 +51,37 @@ export async function initNpcMemory(sim: SimState) {
 }
 
 async function queryNpcMemory(characterKey: string, message: string) {
-  const collection = await vectorDatabaseClient.getOrCreateCollection({
+  // Query character's personal memories
+  const characterCollection = await vectorDatabaseClient.getOrCreateCollection({
     name: characterKey,
   });
-  const results = await collection.query({
+  const characterResults = await characterCollection.query({
     queryTexts: message,
     nResults: 1,
   });
-  if (!results.documents.length) {
-    return '';
+
+  // Query world memories
+  const worldCollection = await vectorDatabaseClient.getOrCreateCollection({
+    name: 'world',
+  });
+  const worldResults = await worldCollection.query({
+    queryTexts: message,
+    nResults: 1,
+  });
+
+  let response = '';
+
+  if (characterResults.documents.length) {
+    response +=
+      'The following personal memory is relevant: ' + characterResults.documents[0] + '. ';
   }
-  console.log('queryNpcMemory', characterKey, message, results.documents[0]);
-  return 'The following memory is relevant: ' + results.documents[0] + '. ';
+
+  if (worldResults.documents.length) {
+    response += 'The following world knowledge is relevant: ' + worldResults.documents[0] + '. ';
+  }
+
+  console.log('queryNpcMemory', characterKey, message, response);
+  return response;
 }
 
 async function addNpcMemory(characterKey: string, message: string) {

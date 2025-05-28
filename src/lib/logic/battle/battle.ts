@@ -22,15 +22,15 @@ export function initBattle(opponentName: string = 'Default AI') {
   drawCard(state, 0, cards['h_franz']);
   drawCard(state, 0, cards['h_vai']);
   drawCard(state, 0, cards['h_coeurebene']);
-  drawCard(state, 1, cards['f_castle']);
-  drawCard(state, 1, cards['f_wall']);
-  drawCard(state, 1, cards['f_cabin']);
-  drawCard(state, 1, cards['f_bridge']);
-  drawCard(state, 1, cards['f_cavalry']);
-  drawCard(state, 1, cards['f_footman']);
-  drawCard(state, 1, cards['f_footman']);
-  drawCard(state, 1, cards['f_golem']);
-  drawCard(state, 1, cards['f_dragon']);
-  drawCard(state, 1, cards['f_cabin']);
+  drawCard(state, 1, cards['m_valhalla']);
+  drawCard(state, 1, cards['m_longhouse']);
+  drawCard(state, 1, cards['m_drakkar']);
+  drawCard(state, 1, cards['m_berserker']);
+  drawCard(state, 1, cards['m_viking']);
+  drawCard(state, 1, cards['m_dwarf']);
+  drawCard(state, 1, cards['m_troll']);
+  drawCard(state, 1, cards['m_valkyrie']);
+  drawCard(state, 1, cards['m_frost_giant']);
+  drawCard(state, 1, cards['m_yggdrasil']);
   playAiTurn(state);
 }

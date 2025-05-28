@@ -5,7 +5,7 @@ import { playAttackHeavySound, playAttackLightSound } from '@lib/sounds';
 import { getOppositeCell } from './board';
 import { damageCard } from './effects';
 
-export function attack(state: BattleState, attacker: DeployedCard) {
+export function attack(state: BattleState, attacker: DeployedCard, simulation: boolean = false) {
   if (!attacker.attack) {
     return;
   }
@@ -29,13 +29,16 @@ export function attack(state: BattleState, attacker: DeployedCard) {
         strength -= targetCard.keywords.armor;
       }
       damageCard(state, targetCard, strength);
-      window.setTimeout(() => {
-        if (attacker.attack?.strength && attacker.attack.strength > 1) {
-          playAttackHeavySound();
-        } else {
-          playAttackLightSound();
-        }
-      }, config.soundDelay * index);
+      console.log('simulation', simulation, attacker);
+      if (!simulation) {
+        window.setTimeout(() => {
+          if (attacker.attack?.strength && attacker.attack.strength > 1) {
+            playAttackHeavySound();
+          } else {
+            playAttackLightSound();
+          }
+        }, config.soundDelay * index);
+      }
     }
   });
 }

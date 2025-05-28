@@ -35,7 +35,7 @@ export function deployCard(
   state.players[card.ownerId].hand = state.players[card.ownerId].hand.filter(
     (c) => c.instanceId !== card.instanceId
   );
-  attack(state, deployedCard);
+  attack(state, deployedCard, simulation);
   triggerAbilities(state, AbilityTrigger.OnDeploy, deployedCard);
   computeBoardControlStatus(state);
   setPlayerScores(state);

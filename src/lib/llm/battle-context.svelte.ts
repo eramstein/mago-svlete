@@ -3,18 +3,19 @@ import { cards } from '../../data/cards';
 import { reactToContextChange } from './chat';
 import type { DeployedCard } from '../model';
 
+// disabled for now
 export async function chatOnCardEntered(newCard: DeployedCard) {
-  const opponentCharacterKey =
-    gs.sim.characters.find((c) => c.name === gs.battle.players[1].name)?.key || '';
-  const cardTemplate = cards[newCard.id];
-  const currentPlayer = gs.battle.players[newCard.ownerId].name;
-  const description = `${currentPlayer} deployed ${cardTemplate.name} (${cardTemplate.type}).`;
-  // Append to existing context
-  gs.chat.context.game += (gs.chat.context.game ? '\n' : '') + ' --- ' + description;
-  // Have the opponent react to the context change
-  if (newCard.cost > 10) {
-    await reactToContextChange(gs, opponentCharacterKey, description);
-  }
+  // const opponentCharacterKey =
+  //   gs.sim.characters.find((c) => c.name === gs.battle.players[1].name)?.key || '';
+  // const cardTemplate = cards[newCard.id];
+  // const currentPlayer = gs.battle.players[newCard.ownerId].name;
+  // const description = `${currentPlayer} deployed ${cardTemplate.name} (${cardTemplate.type}).`;
+  // // Append to existing context
+  // gs.chat.context.game += (gs.chat.context.game ? '\n' : '') + ' --- ' + description;
+  // // Have the opponent react to the context change
+  // if (newCard.cost > 10) {
+  //   await reactToContextChange(gs, opponentCharacterKey, description);
+  // }
 }
 
 export async function chatOnBattleWon() {
