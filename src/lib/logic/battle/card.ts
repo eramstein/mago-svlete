@@ -19,7 +19,12 @@ export function drawCard(state: BattleState, playerId: number, cardTemplate: Car
   state.players[playerId].hand.push(card);
 }
 
-export function deployCard(state: BattleState, card: Card, position: Position) {
+export function deployCard(
+  state: BattleState,
+  card: Card,
+  position: Position,
+  simulation: boolean = false
+) {
   if (isCellOccupied(state, position.x, position.y)) {
     console.log('Cell is occupied');
     return;
@@ -34,8 +39,10 @@ export function deployCard(state: BattleState, card: Card, position: Position) {
   triggerAbilities(state, AbilityTrigger.OnDeploy, deployedCard);
   computeBoardControlStatus(state);
   setPlayerScores(state);
-  playDeploySound();
-  if (!card.summoned) {
+  if (!simulation) {
+    playDeploySound();
+  }
+  if (!card.summoned && !simulation) {
     chatOnCardEntered(deployedCard);
     passTurn(state);
   }
