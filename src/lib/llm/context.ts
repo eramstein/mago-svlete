@@ -50,7 +50,7 @@ export function addContextFromLocation(gs: State, character: string) {
   gs.chat.context.place = `You are in this place: ${place?.name} (${place?.description})`;
   gs.chat.context.people =
     'The following people are in the same place as you: ' +
-    gs.sim.characters
+    [...gs.sim.characters, gs.sim.player]
       .filter((c) => c.place === gs.sim.characters.find((c) => c.key === character)?.place)
       .filter((c) => c.key !== character)
       .map((c) => c.name)

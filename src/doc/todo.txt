@@ -1,8 +1,6 @@
 explore how LLM makes up stuff when it doesn't know an aspect of a character
 by storing these as memories in the vector DB it can create characters on the fly
 
-avoid reaction on move when both characters move together
-
-better prompt for actions? re-use last chat answer?
-
 problem: switching models for chat and tools is costly
+
+summarize long chats over time to avoid too lonng context window

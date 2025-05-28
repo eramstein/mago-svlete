@@ -109,7 +109,7 @@ export function initChat(
 export async function endChat(chat: ChatState, character: string) {
   const messages = chat.history[character]
     .filter((c) => c.role !== 'system')
-    .map((c) => c.character + ': ' + c.speech || '')
+    .map((c) => c.character + ': ' + c.content || '')
     .join(' \n');
   const promptPrefix = `
       Write a summary of the following conversation. 
@@ -130,32 +130,36 @@ export async function sendMessage(
   gs: State,
   characterKey: string,
   message: string,
-  isSpeech: boolean = true,
+  action: string,
   onStream: ((chunk: string) => void) | null,
   fromCharacterName: string = PLAYER_CONFIG.name
 ) {
-  const messageWithSender = `${fromCharacterName} tells you this: ${message}`;
-  const memoryPrompt = await queryNpcMemory(characterKey, messageWithSender);
+  const messageWithSender = message ? `${fromCharacterName} tells you this: ${message}` : '';
+  const actionWithSender = action ? `${fromCharacterName} does this: ${action}` : '';
+  const memoryPrompt = await queryNpcMemory(
+    characterKey,
+    messageWithSender + ' ' + actionWithSender
+  );
   const contextPrompt = CONTEXT_PREFIX + getFullContextString(gs.chat);
 
   const messageObject: DecodedMessage = {
     role: 'user',
-    content: `${contextPrompt}. ${memoryPrompt}. ${messageWithSender}`,
+    content: `${contextPrompt}. ${memoryPrompt}. ${messageWithSender}. ${actionWithSender}`,
     character: fromCharacterName,
   };
 
-  if (isSpeech) {
-    messageObject.speech = message;
-  } else {
-    messageObject.actions = message;
-  }
+  messageObject.speech = message;
+  messageObject.actions = action;
 
   gs.chat.history[characterKey].push(messageObject);
 
   // Use streaming API
   const stream = await ollama.chat({
     model: LLM_MODEL,
-    messages: gs.chat.history[characterKey],
+    messages: [
+      ...(gs.chat.history[characterKey].length > 10 ? [gs.chat.history[characterKey][0]] : []), // Include system prompt only if more than 10 messages
+      ...gs.chat.history[characterKey].slice(-10), // Keep last 10 messages - TODO: write intermediate summaries?
+    ],
     stream: true,
   });
 
@@ -167,6 +171,13 @@ export async function sendMessage(
 
   fullResponse = extractJsonFromMessage(fullResponse);
 
+  // remove memoryPrompt and context from chat history to avoid bloating it
+  if (gs.chat.history[characterKey].length > 1) {
+    const lastMessage = gs.chat.history[characterKey][gs.chat.history[characterKey].length - 1];
+    lastMessage.content = lastMessage.content.replace(memoryPrompt, '').replace(contextPrompt, '');
+  }
+
+  // add NPC response to chat history
   const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;
   gs.chat.history[characterKey].push({
     role: 'assistant',
@@ -201,7 +212,6 @@ function parseMessage(message: string): MessageExpansion {
 }
 
 function extractJsonFromMessage(message: string): string {
-  console.log('extractJsonFromMessage', message);
   const startJson = message.indexOf('{');
   if (startJson !== -1) {
     const json = message
@@ -210,7 +220,6 @@ function extractJsonFromMessage(message: string): string {
       .replace(/, }/, '}')
       .replace(/^```json\n/, '')
       .replace(/\n```$/, '');
-    console.log('extractJsonFromMessage', json);
     return json.endsWith('}') ? json : json + '}';
   }
   return '';
@@ -225,6 +234,7 @@ export async function checkProposedAction(gs: State, npcKey: string, message: st
     role: 'assistant',
     content: `
       Is the following message a yes or no answer to the proposed action?
+      Analyze the emotion and sentiment of this message to decide if it's positive or negative.
       ${gs.chat.history[npcKey].slice(-1)[0].content}
       You MUST respond with EXACTLY one of these two words: "YES" or "NO".
       Always give an answer.

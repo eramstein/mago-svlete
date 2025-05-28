@@ -3,7 +3,7 @@
   import { sendMessage, endChat, checkProposedAction } from '@/lib/llm/chat';
   import { gs } from '@/lib/state';
   import { getCharacterImage } from '../_helpers';
-  import { act, jointAction } from '@/lib/logic/sim/actions';
+  import { jointAction } from '@/lib/logic/sim/actions';
   import { ActionType } from '@/lib/config';
 
   let { npcKey }: { npcKey: string } = $props();
@@ -38,28 +38,29 @@
       return;
     }
     target.value = '';
-    await sendMessage(gs, npcKey, message, true, onStream);
+
+    let messageInStars = '';
+    let messageOutsideStars = '';
+
+    // Split message into parts within and outside stars
+    const starMatch = message.match(/\*(.*?)\*/);
+    if (starMatch) {
+      messageInStars = starMatch[1];
+      messageOutsideStars = message.replace(/\*.*?\*/, '').trim();
+    } else {
+      messageInStars = '';
+      messageOutsideStars = message;
+    }
+
+    await sendMessage(gs, npcKey, messageOutsideStars, messageInStars, onStream);
     currentMessage = '';
     fullMessage = '';
     if (includesActionProposal) {
       const response = await checkProposedAction(gs, npcKey, message);
-      console.log('includesActionProposal', response);
       if (response?.answer === 'YES' && response?.action) {
         proposedAction = response.action;
       }
     }
-  }
-
-  async function actionChat(e: Event) {
-    const target = e.target as HTMLInputElement;
-    if (!target) {
-      return;
-    }
-    const action = target.value;
-    target.value = '';
-    await sendMessage(gs, npcKey, action, false, onStreamAction);
-    currentAction = '';
-    fullAction = '';
   }
 
   async function executeAction() {
@@ -150,17 +151,18 @@
     <input
       class="chat-input"
       type="text"
-      onchange={(e) => sendChat(e, true)}
+      onkeydown={(e) => e.key === 'Enter' && sendChat(e, true)}
       placeholder="Propose a common action..."
     />
   </div>
   <div class="input-container">
     <span class="input-icon">💬</span>
-    <input class="chat-input" type="text" onchange={sendChat} placeholder="Type your message..." />
-  </div>
-  <div class="input-container">
-    <span class="input-icon">👋</span>
-    <input class="chat-input" type="text" onchange={actionChat} placeholder="Type your action..." />
+    <input
+      class="chat-input"
+      type="text"
+      onkeydown={(e) => e.key === 'Enter' && sendChat(e)}
+      placeholder="Type your message..."
+    />
   </div>
 </div>
 

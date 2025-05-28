@@ -45,6 +45,8 @@ export async function jointAction(
       action.fn(gs, character, args);
     });
   }
-  triggerReactionsOnAction(gs, gs.sim.player, actionType);
+  if (actionType !== ActionType.GoTo) {
+    triggerReactionsOnAction(gs, gs.sim.player, actionType);
+  }
   passTime(gs.sim, action.duration);
 }
