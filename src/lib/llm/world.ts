@@ -44,9 +44,9 @@ export async function queryWorldsMemory(message: string) {
   // - 1 means orthogonal (no similarity)
   // - 2 means opposite
   const distance = results.distances[0]?.[0];
-  if (distance > 1.6) {
+  if (distance > 1.5) {
     console.log('Memory query distance too high:', results, distance);
     return '';
   }
-  return 'The following information is relevant: ' + results.documents[0] + '. ';
+  return 'The following world information is relevant: ' + results.documents[0] + '. ';
 }

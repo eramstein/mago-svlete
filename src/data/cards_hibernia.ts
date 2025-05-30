@@ -17,7 +17,7 @@ import {
 import type { CardTemplate } from '@lib/model/model-battle';
 import { cards } from './cards';
 
-export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
+export const cardsHibernia: Record<string, CardTemplate> = {
   h_vai: {
     id: 'h_vai',
     name: 'Vai',
@@ -37,6 +37,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
         },
       },
     ],
+    cost: 10,
   },
   h_coeurebene: {
     id: 'h_coeurebene',
@@ -53,13 +54,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
         },
       },
     ],
-  },
-  h_shrooms_stream: {
-    id: 'h_shrooms_stream',
-    name: 'Shrooms Stream',
-    hp: 1,
-    type: CardType.Structure,
-    realm: Realm.Hibernia,
+    cost: 7,
   },
   h_franz: {
     id: 'h_franz',
@@ -83,6 +78,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
         },
       },
     ],
+    cost: 11,
   },
   h_druid: {
     id: 'h_druid',
@@ -103,6 +99,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
         },
       },
     ],
+    cost: 8,
   },
   h_celtic_village: {
     id: 'h_celtic_village',
@@ -114,6 +111,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
       direction: ControlDirection.Horizontal,
       strength: 1,
     },
+    cost: 6,
   },
   h_bear_cabin: {
     id: 'h_bear_cabin',
@@ -129,6 +127,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
     attack: {
       strength: 1,
     },
+    cost: 5,
   },
   h_cursed_forest: {
     id: 'h_cursed_forest',
@@ -141,6 +140,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
       strength: 5,
       distance: 1,
     },
+    cost: 5,
   },
   h_fireflies_clearing: {
     id: 'h_fireflies_clearing',
@@ -151,6 +151,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
     control: {
       direction: ControlDirection.Diagonal,
     },
+    cost: 11,
   },
   h_leprechaun: {
     id: 'h_leprechaun',
@@ -167,6 +168,7 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
         },
       },
     ],
+    cost: 7,
   },
   h_treeman: {
     id: 'h_treeman',
@@ -180,5 +182,14 @@ export const cardsHibernia: Record<string, Omit<CardTemplate, 'cost'>> = {
     control: {
       direction: ControlDirection.Vertical,
     },
+    cost: 11,
+  },
+  h_shrooms_stream: {
+    id: 'h_shrooms_stream',
+    name: 'Shrooms Stream',
+    hp: 1,
+    type: CardType.Structure,
+    realm: Realm.Hibernia,
+    cost: 1,
   },
 };

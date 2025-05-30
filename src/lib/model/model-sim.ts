@@ -1,4 +1,5 @@
 import type { State } from './main';
+import type { CardTemplate } from './model-battle';
 
 export interface SimState {
   time: Time;
@@ -32,6 +33,7 @@ export interface Character {
   name: string;
   place: number;
   zone: number;
+  decks: Deck[];
 }
 
 export interface ActionTypeDefinition {
@@ -41,3 +43,9 @@ export interface ActionTypeDefinition {
 }
 
 export type ActionEffect = (gs: State, character: Character, args: any) => void;
+
+export type Deck = {
+  name: string;
+  ownerId: number;
+  cardIds: string[];
+};

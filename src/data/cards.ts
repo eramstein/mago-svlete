@@ -6,7 +6,7 @@ import { cardsMidgard } from './cards_midgard';
 import { cardsItalia } from './cards_italia';
 import { cardsArabia } from './cards_arabia';
 
-export const baseCards: Record<string, Omit<CardTemplate, 'cost'>> = {
+export const baseCards: Record<string, CardTemplate> = {
   ...cardsFrankia,
   ...cardsHibernia,
   ...cardsMidgard,
@@ -20,8 +20,7 @@ export const cards: Record<string, CardTemplate> = {};
 Object.entries(baseCards).forEach(([id, card]) => {
   cards[id] = {
     ...card,
-    cost: estimateCardCost(card as Card),
+    //cost: estimateCardCost(card as Card),
     //cost: 0,
   };
 });
-console.log(cards);

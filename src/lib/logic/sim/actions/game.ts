@@ -12,7 +12,7 @@ export function startGameTool(
 ) {
   const opponent = gs.sim.characters.find((c) => c.name === param.opponent);
   if (opponent) {
-    initBattle(opponent.name);
+    initBattle(opponent.name, [gs.sim.player.decks[0], opponent.decks[0]]);
     if (!gs.chat.history[opponent.key]) {
       initChat(gs.chat, opponent.key);
     }

@@ -11,9 +11,9 @@
   import { resetContext } from '@lib/llm/context';
 
   function playAgain() {
-    resetBattleState(initialBattleState);
-    initBattle();
-    resetContext(gs.chat);
+    const opponentName = gs.battle.players[1].name;
+    const opponentId = gs.sim.characters.findIndex((c) => c.name === opponentName);
+    initBattle(opponentName, [gs.sim.player.decks[0], gs.sim.characters[opponentId].decks[0]]);
   }
 
   function stopPlaying() {

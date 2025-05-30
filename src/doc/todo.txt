@@ -3,4 +3,16 @@ by storing these as memories in the vector DB it can create characters on the fl
 
 problem: switching models for chat and tools is costly
 
-summarize long chats over time to avoid too lonng context window
+summarize long chats over time to avoid too long context window
+
+summarize opnions about NPCs from memories from time to time
+
+finer control on NPC memories with specific entry IDs:
+- deck lists
+- opinions about other NPCs (about the player might be more detailed and in the main system prompt?)
+
+places memories seem to surface too much in irrelevant situations
+
+problem: the typical semantic space of the simulation (nerdy games) is quite narrow,
+and the LLM confuses things like MTG and Warhammer (Skaven deck?)
+RAG isn't easy to use in a performant way for these cases.

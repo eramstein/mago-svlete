@@ -10,6 +10,7 @@ import type { SimState } from '../model';
 import type { State } from '../model/main';
 import { addContextFromLocation, getFullContextString, resetContext } from './context';
 import { gs } from '../state/main.svelte';
+import { queryWorldsMemory } from './world';
 
 const SYSTEM_PROMPT_PREFIX = `
   This is a collaborative writing with the user. You are writing a character named 
@@ -27,6 +28,7 @@ Return only ONE such object. Do not return multiple objects.
 IMPORTANT: All property values MUST be enclosed in double quotes. 
 Do not use single quotes or omit quotes.
 Don't forget the comma before "actions".
+Keep it short, 5 or 6 sentences max.
 Example of correct format:
 {
   "speech": "Hello there!",
@@ -60,14 +62,7 @@ async function queryNpcMemory(characterKey: string, message: string) {
     nResults: 1,
   });
 
-  // Query world memories
-  const worldCollection = await vectorDatabaseClient.getOrCreateCollection({
-    name: 'world',
-  });
-  const worldResults = await worldCollection.query({
-    queryTexts: message,
-    nResults: 1,
-  });
+  const worldResults = await queryWorldsMemory(message);
 
   let response = '';
 
@@ -76,8 +71,8 @@ async function queryNpcMemory(characterKey: string, message: string) {
       'The following personal memory is relevant: ' + characterResults.documents[0] + '. ';
   }
 
-  if (worldResults.documents.length) {
-    response += 'The following world knowledge is relevant: ' + worldResults.documents[0] + '. ';
+  if (worldResults) {
+    response += ' ' + worldResults + '. ';
   }
 
   console.log('queryNpcMemory', characterKey, message, response);
@@ -89,6 +84,7 @@ async function addNpcMemory(characterKey: string, message: string) {
   const collection = await vectorDatabaseClient.getOrCreateCollection({
     name: characterKey,
   });
+  console.log('addNpcMemory', characterKey, message);
   collection.add({
     ids: [uid],
     metadatas: [{ type: 'c' }],
@@ -126,23 +122,28 @@ export function initChat(
 }
 
 export async function endChat(chat: ChatState, character: string) {
+  const summary = await summarizeChat(chat, character);
+  addNpcMemory(character, summary);
+  delete chat.history[character];
+  chat.chattingWith = '';
+  resetContext(chat);
+}
+
+async function summarizeChat(chat: ChatState, character: string) {
   const messages = chat.history[character]
     .filter((c) => c.role !== 'system')
     .map((c) => c.character + ': ' + c.content || '')
     .join(' \n');
   const promptPrefix = `
-      Write a summary of the following conversation. 
-      Focus on important and memorable elements. Return only the summary, no other text.
-      Conversation: 
-    `;
+    Write a summary of the following conversation. 
+    Focus on important and memorable elements. Return only the summary, no other text.
+    Conversation: 
+  `;
   const memory = await ollama.chat({
     model: LLM_MODEL,
     messages: [{ role: 'user', content: promptPrefix + messages }],
   });
-  addNpcMemory(character, memory.message.content);
-  delete chat.history[character];
-  chat.chattingWith = '';
-  resetContext(chat);
+  return memory.message.content;
 }
 
 export async function sendMessage(
@@ -153,6 +154,9 @@ export async function sendMessage(
   onStream: ((chunk: string) => void) | null,
   fromCharacterName: string = PLAYER_CONFIG.name
 ) {
+  const startTime = performance.now();
+  console.log(`[sendMessage] Starting message to ${characterKey}`);
+
   const messageWithSender = message ? `${fromCharacterName} tells you this: ${message}` : '';
   const actionWithSender = action ? `${fromCharacterName} does this: ${action}` : '';
   const memoryPrompt = await queryNpcMemory(
@@ -173,11 +177,16 @@ export async function sendMessage(
   gs.chat.history[characterKey].push(messageObject);
 
   // Use streaming API
+  const streamStartTime = performance.now();
+  console.log(
+    `[sendMessage] memory request in ${(streamStartTime - startTime).toFixed(2)}ms Starting stream request to LLM`
+  );
+
   const stream = await ollama.chat({
     model: LLM_MODEL,
     messages: [
-      ...(gs.chat.history[characterKey].length > 10 ? [gs.chat.history[characterKey][0]] : []), // Include system prompt only if more than 10 messages
-      ...gs.chat.history[characterKey].slice(-10), // Keep last 10 messages - TODO: write intermediate summaries?
+      ...gs.chat.history[characterKey].filter((c) => c.role === 'system'),
+      ...gs.chat.history[characterKey].filter((c) => c.role !== 'system').slice(-6),
     ],
     stream: true,
   });
@@ -187,6 +196,11 @@ export async function sendMessage(
     fullResponse += chunk.message.content;
     onStream?.(chunk.message.content);
   }
+
+  const streamEndTime = performance.now();
+  console.log(
+    `[sendMessage] Stream completed in ${(streamEndTime - streamStartTime).toFixed(2)}ms`
+  );
 
   fullResponse = extractJsonFromMessage(fullResponse);
 
@@ -204,6 +218,19 @@ export async function sendMessage(
     character: characterName,
     ...parseMessage(fullResponse),
   });
+
+  // every 10 messages, add a summary to the chat history
+  if ((gs.chat.history[characterKey].length - 1) % 10 <= 1) {
+    summarizeChat(gs.chat, characterKey).then((summary) => {
+      gs.chat.history[characterKey].push({
+        role: 'system',
+        content: 'Summary ealier parts of the conversation: ' + summary,
+      });
+    });
+  }
+
+  const endTime = performance.now();
+  console.log(`[sendMessage] Total execution time: ${(endTime - startTime).toFixed(2)}ms`);
 }
 
 export async function findActionRequestInMessage(
@@ -237,6 +264,7 @@ function extractJsonFromMessage(message: string): string {
       .substring(startJson)
       .trim()
       .replace(/, }/, '}')
+      .replace(/""/g, '"')
       .replace(/^```json\n/, '')
       .replace(/\n```$/, '');
     return json.endsWith('}') ? json : json + '}';
@@ -250,20 +278,27 @@ export async function checkProposedAction(gs: State, npcKey: string, message: st
     return null;
   }
   const systemPrompt = {
-    role: 'assistant',
+    role: 'system',
     content: `
-      Is the following message a yes or no answer to the proposed action?
-      Analyze the emotion and sentiment of this message to decide if it's positive or negative.
-      ${gs.chat.history[npcKey].slice(-1)[0].content}
+      You are a system which decides whether an answer to a question or either YES or NO.
       You MUST respond with EXACTLY one of these two words: "YES" or "NO".
       Always give an answer.
       Do not include any other text, explanations, or punctuation.
       Just respond with either "YES" or "NO".
+      In case of doubt, answer YES.
+    `,
+  };
+  const question = {
+    role: 'user',
+    content: `
+      This was the question: ${message}
+      This was the answer the person gave: ${gs.chat.history[npcKey].slice(-1)[0].content}
+      Is it a YES or a NO?
     `,
   };
   const response = await ollama.chat({
     model: LLM_MODEL_TOOLS,
-    messages: [systemPrompt],
+    messages: [systemPrompt, question],
     options: {
       temperature: 0.1, // Lower temperature for more deterministic responses
     },

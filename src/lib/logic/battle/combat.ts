@@ -29,7 +29,6 @@ export function attack(state: BattleState, attacker: DeployedCard, simulation: b
         strength -= targetCard.keywords.armor;
       }
       damageCard(state, targetCard, strength);
-      console.log('simulation', simulation, attacker);
       if (!simulation) {
         window.setTimeout(() => {
           if (attacker.attack?.strength && attacker.attack.strength > 1) {

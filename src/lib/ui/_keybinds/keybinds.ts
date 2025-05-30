@@ -1,4 +1,3 @@
-import { initBattle } from '@/lib/logic/battle';
 import { loadStateFromLocalStorage, saveStateToLocalStorage, gs } from '../../state';
 
 export function handleKeybinds(event: KeyboardEvent) {

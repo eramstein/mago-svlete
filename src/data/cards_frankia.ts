@@ -1,18 +1,17 @@
 import { AttackDirection, CardType, ControlDirection, Realm } from '@lib/config/enums-battle';
 import type { CardTemplate } from '@lib/model/model-battle';
-import { rebuild } from '@lib/logic/battle/effects';
-import { OnDeploy, TargetAllies } from '@lib/logic/battle/ability-shorthands';
 
-export const cardsFrankia: Record<string, Omit<CardTemplate, 'cost'>> = {
+export const cardsFrankia: Record<string, CardTemplate> = {
   f_castle: {
     id: 'f_castle',
     name: 'Camelot',
-    hp: 5,
+    hp: 3,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.Diagonal,
+      direction: ControlDirection.Cross,
     },
     realm: Realm.Frankia,
+    cost: 8,
   },
   f_bridge: {
     id: 'f_bridge',
@@ -20,38 +19,32 @@ export const cardsFrankia: Record<string, Omit<CardTemplate, 'cost'>> = {
     hp: 3,
     type: CardType.Structure,
     control: {
-      direction: ControlDirection.All,
-      distance: 1,
+      direction: ControlDirection.Cross,
     },
     realm: Realm.Frankia,
+    cost: 8,
   },
   f_cabin: {
     id: 'f_cabin',
     name: 'Wood Cabin',
-    hp: 1,
+    hp: 3,
     type: CardType.Structure,
     control: {
       direction: ControlDirection.Cross,
-      distance: 1,
-      strength: 2,
     },
     realm: Realm.Frankia,
+    cost: 8,
   },
   f_wall: {
     id: 'f_wall',
     name: 'Stone Wall',
-    hp: 99,
+    hp: 3,
     type: CardType.Structure,
+    control: {
+      direction: ControlDirection.Cross,
+    },
     realm: Realm.Frankia,
-    abilities: [
-      {
-        trigger: OnDeploy,
-        targets: TargetAllies,
-        effect: (state, card, target) => {
-          rebuild(target, 5);
-        },
-      },
-    ],
+    cost: 8,
   },
   f_cavalry: {
     id: 'f_cavalry',
@@ -59,58 +52,58 @@ export const cardsFrankia: Record<string, Omit<CardTemplate, 'cost'>> = {
     hp: 2,
     type: CardType.Unit,
     attack: {
-      directions: [AttackDirection.Left, AttackDirection.Right],
       strength: 1,
     },
     control: {
-      direction: ControlDirection.Horizontal,
+      direction: ControlDirection.All,
       distance: 1,
-      strength: 1,
-    },
-    keywords: {
-      flanking: 1,
     },
     realm: Realm.Frankia,
+    cost: 6,
   },
   f_footman: {
     id: 'f_footman',
     name: 'Footman',
-    hp: 1,
+    hp: 2,
     type: CardType.Unit,
     attack: {
-      directions: [AttackDirection.Up, AttackDirection.Down],
-      strength: 2,
-    },
-    control: {
-      direction: ControlDirection.Vertical,
       strength: 1,
     },
+    control: {
+      direction: ControlDirection.All,
+      distance: 1,
+    },
     realm: Realm.Frankia,
+    cost: 6,
   },
   f_dragon: {
     id: 'f_dragon',
     name: 'Dragon',
-    hp: 1,
+    hp: 2,
     type: CardType.Unit,
     attack: {
-      directions: [AttackDirection.Right],
-      strength: 5,
+      strength: 1,
+    },
+    control: {
+      direction: ControlDirection.All,
+      distance: 1,
     },
     realm: Realm.Frankia,
+    cost: 6,
   },
   f_golem: {
     id: 'f_golem',
     name: 'Golem',
-    hp: 3,
+    hp: 2,
     type: CardType.Unit,
     attack: {
-      strength: 2,
+      strength: 1,
     },
     control: {
-      direction: ControlDirection.Cross,
+      direction: ControlDirection.All,
       distance: 1,
-      strength: 2,
     },
     realm: Realm.Frankia,
+    cost: 6,
   },
 };

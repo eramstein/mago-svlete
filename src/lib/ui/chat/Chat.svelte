@@ -5,12 +5,12 @@
   import { getCharacterImage } from '../_helpers';
   import { jointAction } from '@/lib/logic/sim/actions';
   import { ActionType } from '@/lib/config';
+  import { initBattle } from '@/lib/logic';
 
   let { npcKey }: { npcKey: string } = $props();
 
   let fullMessage = '';
   let currentMessage = $state('');
-  let fullAction = '';
   let currentAction = $state('');
   let proposedAction = $state<{ actionType: ActionType; args: Record<string, any> } | null>(null);
   let chatHistoryElement: HTMLDivElement;
@@ -33,6 +33,14 @@
       return;
     }
     const message = target.value;
+    if (includesActionProposal && message === 'battle') {
+      const opponentId = gs.sim.characters.findIndex((c) => c.key === npcKey);
+      initBattle(gs.sim.characters[opponentId].name, [
+        gs.sim.player.decks[0],
+        gs.sim.characters[opponentId].decks[0],
+      ]);
+      return;
+    }
     if (message === 'bye') {
       endChat(gs.chat, npcKey);
       return;
@@ -86,14 +94,6 @@
     // this is trick to display text only after the speech JSON property is set in the response
     if (fullMessage.includes(': "')) {
       currentMessage += chunk;
-    }
-  }
-
-  function onStreamAction(chunk: string) {
-    fullAction += chunk;
-    // this is trick to display text only after the speech JSON property is set in the response
-    if (fullAction.includes(': "')) {
-      currentAction += chunk;
     }
   }
 

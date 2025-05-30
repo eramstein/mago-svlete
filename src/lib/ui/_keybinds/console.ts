@@ -16,4 +16,9 @@ export const consoleCommands = {
   l: () => {
     console.log(JSON.stringify(gs, null, 2));
   },
+  vdb: async () => {
+    await resetVectorDatabase();
+    await initNpcMemory(gs.sim);
+    await initWorldMemory();
+  },
 };
