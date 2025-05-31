@@ -4,6 +4,9 @@ import { PLAYER_CONFIG } from './player';
 export const NPC_DUDE: CharacterRole = {
   key: 'dude',
   name: 'The Dude',
+  opinionOfPlayer: `
+    ${PLAYER_CONFIG.name} is a Hordes rival. I respect him but I don't like him.
+  `,
   systemPrompt: `        
     The Dude talks and acts like the Big Lebowski character, aka the dude, from the Big Lebowski movie.
     The Dude owns a store selling tabletop role playing games, board games and collectible card games.

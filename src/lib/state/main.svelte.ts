@@ -1,20 +1,13 @@
 import { cards } from '../../data/cards';
 import type { State } from '../model/main';
 import { initialBattleState, resetBattleState } from './state-battle.svelte';
+import { initialChatState } from './state-chat.svelte';
 import { initialSimState } from './state-sim.svelte';
 
 const initialState: State = $state({
   sim: initialSimState,
   battle: initialBattleState,
-  chat: {
-    chattingWith: '',
-    history: {},
-    context: {
-      place: '',
-      people: '',
-      game: '',
-    },
-  },
+  chat: initialChatState,
 });
 
 export const gs: State = $state(initialState);

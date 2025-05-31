@@ -28,7 +28,7 @@ Return only ONE such object. Do not return multiple objects.
 IMPORTANT: All property values MUST be enclosed in double quotes. 
 Do not use single quotes or omit quotes.
 Don't forget the comma before "actions".
-Keep it short, 5 or 6 sentences max.
+Keep it relatively short, 5 to 12 sentences max.
 Example of correct format:
 {
   "speech": "Hello there!",
@@ -112,30 +112,57 @@ export function initChat(
     fromCharacterName +
     '. ' +
     NPCS[character].systemPrompt;
+  addContextFromLocation(gs, character);
+  const opinionPrompt = `IMPORTANT: This is your opinion of ${PLAYER_CONFIG.name}: ${chat.characterOpinions[character]}. `;
+  const contextPrompt = CONTEXT_PREFIX + getFullContextString(gs.chat);
   chat.history[character] = [
     {
       role: 'system',
-      content: SYSTEM_PROMPT_PREFIX + npcPrompt + SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS,
+      content: `
+        ${SYSTEM_PROMPT_PREFIX}
+        ${npcPrompt}
+        ${contextPrompt}
+        ${opinionPrompt}
+        ${SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS}
+      `,
     },
   ];
-  addContextFromLocation(gs, character);
 }
 
 export async function endChat(chat: ChatState, character: string) {
   const summary = await summarizeChat(chat, character);
   addNpcMemory(character, summary);
+  updateNpcOpinion(chat, character, summary);
   delete chat.history[character];
   chat.chattingWith = '';
   resetContext(chat);
+}
+
+function updateNpcOpinion(chat: ChatState, character: string, summary: string) {
+  const opinion = chat.characterOpinions[character];
+  const promptPrefix = `
+    This was the opinion ${character} had of ${PLAYER_CONFIG.name}: ${opinion}
+    Update the opinion of ${character} of ${PLAYER_CONFIG.name} based on the following summary: ${summary}
+    Keep track of how well the characters know each other now, how their opinions and feelings evolve.
+    For example, after a very positive encounter between 2 acquaintances, their opinion of each other should be more positive than before, and the fact that they know each other better noted.
+    Return only the updated opinion, no other text.
+  `;
+  ollama
+    .chat({
+      model: LLM_MODEL,
+      messages: [{ role: 'user', content: promptPrefix + summary }],
+    })
+    .then((m) => (chat.characterOpinions[character] = m.message.content));
 }
 
 async function summarizeChat(chat: ChatState, character: string) {
   const messages = chat.history[character]
     .filter((c) => c.role !== 'system')
     .map((c) => c.character + ': ' + c.content || '')
+    .map((c) => c.replace(/<memory>.*<\/memory>/g, ''))
     .join(' \n');
   const promptPrefix = `
-    Write a summary of the following conversation. 
+    Write a 10 or 12 sentences summary of the following conversation. 
     Focus on important and memorable elements. Return only the summary, no other text.
     Conversation: 
   `;
@@ -163,11 +190,9 @@ export async function sendMessage(
     characterKey,
     messageWithSender + ' ' + actionWithSender
   );
-  const contextPrompt = CONTEXT_PREFIX + getFullContextString(gs.chat);
-
   const messageObject: DecodedMessage = {
     role: 'user',
-    content: `${contextPrompt}. ${memoryPrompt}. ${messageWithSender}. ${actionWithSender}`,
+    content: `<memory>${memoryPrompt}.</memory> ${messageWithSender}. ${actionWithSender}`,
     character: fromCharacterName,
   };
 
@@ -203,12 +228,6 @@ export async function sendMessage(
   );
 
   fullResponse = extractJsonFromMessage(fullResponse);
-
-  // remove memoryPrompt and context from chat history to avoid bloating it
-  if (gs.chat.history[characterKey].length > 1) {
-    const lastMessage = gs.chat.history[characterKey][gs.chat.history[characterKey].length - 1];
-    lastMessage.content = lastMessage.content.replace(memoryPrompt, '').replace(contextPrompt, '');
-  }
 
   // add NPC response to chat history
   const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;

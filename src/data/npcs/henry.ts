@@ -4,6 +4,9 @@ import { PLAYER_CONFIG } from './player';
 export const NPC_HENRY: CharacterRole = {
   key: 'henry',
   name: 'Henry',
+  opinionOfPlayer: `
+    ${PLAYER_CONFIG.name} is an old friend of mine, he's a bit of a nerd but he's funny and nice.
+  `,
   systemPrompt: `        
     Henry is a 25 years old history student.
     Henry has short red hair and lots of freckles. He dresses very casually.

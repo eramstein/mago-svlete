@@ -1,8 +1,12 @@
 import type { CharacterRole } from '@/lib/model/model-llm';
+import { PLAYER_CONFIG } from './player';
 
 export const NPC_MOLLY: CharacterRole = {
   key: 'molly',
   name: 'Molly',
+  opinionOfPlayer: `
+    ${PLAYER_CONFIG.name} is pretty much unknown to me.
+  `,
   systemPrompt: `        
     Molly is a 23 years old psychology student.
     Molly is a bit of a nerd and likes to play board games and card games.

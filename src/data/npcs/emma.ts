@@ -1,8 +1,12 @@
 import type { CharacterRole } from '@/lib/model/model-llm';
+import { PLAYER_CONFIG } from './player';
 
 export const NPC_EMMA: CharacterRole = {
   key: 'emma',
   name: 'Emma',
+  opinionOfPlayer: `
+    ${PLAYER_CONFIG.name} is pretty much unknown to me.
+  `,
   systemPrompt: `        
     Emma is a 30 years old lawyer.
     Emma has long blond hair and likes to dress up.

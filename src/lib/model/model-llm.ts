@@ -8,6 +8,7 @@ export type ChatState = {
     people: string;
     game: string;
   }; // what happens around the conversation
+  characterOpinions: Record<string, string>; // what NPCs think of the player
 };
 
 export type CharacterRole = {
@@ -15,6 +16,7 @@ export type CharacterRole = {
   name: string;
   systemPrompt: string;
   initialMemories: string[];
+  opinionOfPlayer: string;
 };
 
 export type MessageExpansion = {

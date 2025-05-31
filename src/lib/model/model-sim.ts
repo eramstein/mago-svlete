@@ -34,6 +34,7 @@ export interface Character {
   place: number;
   zone: number;
   decks: Deck[];
+  cardCollection: Record<string, number>; // cardId -> number of cards
 }
 
 export interface ActionTypeDefinition {

@@ -8,6 +8,17 @@ import { NPC_HENRY } from '@/data/npcs/henry';
 import { realmDecks } from '@/data/decks';
 import { Realm } from '../config/enums-battle';
 
+// Helper function to initialize card collection from deck
+const initializeCardCollection = (cardIds: string[]) => {
+  return cardIds.reduce(
+    (acc, cardId) => {
+      acc[cardId] = (acc[cardId] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+};
+
 export const initialSimState: SimState = {
   time: {
     startDate: new Date(),
@@ -27,6 +38,7 @@ export const initialSimState: SimState = {
           cardIds: realmDecks[Realm.Frankia],
         },
       ],
+      cardCollection: initializeCardCollection(realmDecks[Realm.Frankia]),
     },
     {
       key: NPC_MOLLY.key,
@@ -40,6 +52,7 @@ export const initialSimState: SimState = {
           cardIds: realmDecks[Realm.Arabia],
         },
       ],
+      cardCollection: initializeCardCollection(realmDecks[Realm.Arabia]),
     },
     {
       key: NPC_EMMA.key,
@@ -53,6 +66,7 @@ export const initialSimState: SimState = {
           cardIds: realmDecks[Realm.Italia],
         },
       ],
+      cardCollection: initializeCardCollection(realmDecks[Realm.Italia]),
     },
     {
       key: NPC_HENRY.key,
@@ -66,6 +80,7 @@ export const initialSimState: SimState = {
           cardIds: realmDecks[Realm.Midguard],
         },
       ],
+      cardCollection: initializeCardCollection(realmDecks[Realm.Midguard]),
     },
   ],
   player: {
@@ -80,5 +95,6 @@ export const initialSimState: SimState = {
         cardIds: realmDecks[Realm.Hibernia],
       },
     ],
+    cardCollection: initializeCardCollection(realmDecks[Realm.Hibernia]),
   },
 };

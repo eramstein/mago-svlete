@@ -45,6 +45,8 @@
       endChat(gs.chat, npcKey);
       return;
     }
+
+    // Clear the input and focus it
     target.value = '';
 
     let messageInStars = '';
@@ -105,7 +107,11 @@
 
 <div class="chat-container">
   <div class="portrait-container">
-    <div class="portrait" style="background-image: url({getCharacterImage(npcKey)})"></div>
+    <div
+      class="portrait"
+      style="background-image: url({getCharacterImage(npcKey)})"
+      onclick={() => console.log(gs.chat.characterOpinions[npcKey])}
+    ></div>
   </div>
   <div id="chat-history" class="chat-history" bind:this={chatHistoryElement}>
     {#each gs.chat.history[npcKey]?.filter((m) => m.role !== 'system') as message}
@@ -152,7 +158,6 @@
       class="chat-input"
       type="text"
       onkeydown={(e) => e.key === 'Enter' && sendChat(e, true)}
-      placeholder="Propose a common action..."
     />
   </div>
   <div class="input-container">
@@ -170,17 +175,19 @@
   .chat-container {
     display: flex;
     flex-direction: column;
-    width: 290px;
+    width: 420px;
     height: 100%;
     background-color: #333;
     color: white;
   }
   .portrait-container {
-    width: 270px;
+    width: 100%;
     height: 270px;
-    padding: 10px;
     background-image: url('/src/assets/ui/border_wood_square.png');
     background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .portrait {
     width: 100%;
@@ -209,7 +216,6 @@
   }
   .chat-input {
     width: 100%;
-    height: 20px;
   }
   .chat-bit {
     margin-top: 5px;
