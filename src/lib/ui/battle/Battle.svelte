@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resetBattleState, initialBattleState } from '@lib/state/state-battle.svelte';
   import { initBattle } from '@lib/logic/battle';
-  import { uiState } from '@lib/state/state-ui.svelte';
+  import { uiState, UiView } from '@lib/state/state-ui.svelte';
 
   import CardInfo from './CardInfo.svelte';
   import Player from './Player.svelte';
@@ -19,6 +19,7 @@
   function stopPlaying() {
     resetBattleState(initialBattleState);
     resetContext(gs.chat);
+    uiState.currentView = UiView.Sim;
   }
 </script>
 

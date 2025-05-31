@@ -6,6 +6,7 @@
   import { jointAction } from '@/lib/logic/sim/actions';
   import { ActionType } from '@/lib/config';
   import { initBattle } from '@/lib/logic';
+  import { uiState, UiView } from '@/lib/state/state-ui.svelte';
 
   let { npcKey }: { npcKey: string } = $props();
 
@@ -39,6 +40,7 @@
         gs.sim.player.decks[0],
         gs.sim.characters[opponentId].decks[0],
       ]);
+      uiState.currentView = UiView.Battle;
       return;
     }
     if (message === 'bye') {
