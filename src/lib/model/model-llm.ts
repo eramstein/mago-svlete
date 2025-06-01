@@ -20,9 +20,8 @@ export type CharacterRole = {
 };
 
 export type MessageExpansion = {
-  speech?: string;
-  actions?: string;
   character?: string;
+  displayMessage?: string;
 };
 
 export type DecodedMessage = Message & MessageExpansion;

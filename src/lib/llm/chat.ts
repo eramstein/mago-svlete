@@ -5,35 +5,23 @@ import { vectorDatabaseClient } from './vector-db';
 import { LLM_MODEL, LLM_MODEL_TOOLS } from './config';
 import { PLAYER_CONFIG } from '@/data/npcs/player';
 import { getActionFromText } from './action';
-import { ACTIONS } from '../logic/sim/action-types';
 import type { SimState } from '../model';
 import type { State } from '../model/main';
 import { addContextFromLocation, getFullContextString, resetContext } from './context';
 import { gs } from '../state/main.svelte';
 import { queryWorldsMemory } from './world';
 
-const SYSTEM_PROMPT_PREFIX = `
-  This is a collaborative writing with the user. You are writing a character named 
-`;
-const SYSTEM_PROMPT_PREFIX_2 = `
-  The user is writing a character named 
-`;
-const SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS = `
-Return a JSON output describing what your character says and what actions he takes in that interaction. Format:
-{
-  "speech": "<what your character says>",
-  "actions": "<what your character does>"
-}
-Return only ONE such object. Do not return multiple objects.
-IMPORTANT: All property values MUST be enclosed in double quotes. 
-Do not use single quotes or omit quotes.
-Don't forget the comma before "actions".
-Example of correct format:
-{
-  "speech": "Hello there!",
-  "actions": "waves hand"
-}
-`;
+const SYSTEM_PROMPT_PREFIX = `This is a collaborative writing with the user. Make short answers (2-3 sentences). You are writing a character named`;
+const SYSTEM_PROMPT_PREFIX_2 = `The user is writing a character named`;
+// const SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS = `
+// Return a JSON output describing what your character says and what actions he takes in that interaction. Format:
+// {
+//   "speech": "<what your character says>",
+//   "actions": "<what your character does>"
+// }
+// `;
+const SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS =
+  'For every user message, replay with what your character says and does.';
 const CONTEXT_PREFIX = `
   For context, this is what is happening around your character: 
 `;
@@ -60,14 +48,14 @@ async function queryNpcMemory(characterKey: string, message: string) {
     queryTexts: message,
     nResults: 1,
   });
+  const characterMemoryDistance = characterResults.distances?.[0]?.[0] || 2;
 
   const worldResults = await queryWorldsMemory(message);
 
   let response = '';
 
-  if (characterResults.documents.length) {
-    response +=
-      'The following personal memory is relevant: ' + characterResults.documents[0] + '. ';
+  if (characterResults.documents.length && characterMemoryDistance < 1.5) {
+    response += 'Personal memory: ' + characterResults.documents[0] + '. ';
   }
 
   if (worldResults) {
@@ -99,7 +87,7 @@ export function chatWithNpc(chat: ChatState, character: string) {
   initChat(chat, character);
 }
 
-export function initChat(
+function getSystemPrompt(
   chat: ChatState,
   character: string,
   fromCharacterName: string = PLAYER_CONFIG.name
@@ -111,19 +99,30 @@ export function initChat(
     fromCharacterName +
     '. ' +
     NPCS[character].systemPrompt;
+
+  const opinionPrompt = `This is the opinion ${character} has of ${PLAYER_CONFIG.name}: ${chat.characterOpinions[character]}. `;
+
   addContextFromLocation(gs, character);
-  const opinionPrompt = `IMPORTANT: This is your opinion of ${PLAYER_CONFIG.name}: ${chat.characterOpinions[character]}. `;
   const contextPrompt = CONTEXT_PREFIX + getFullContextString(gs.chat);
+
+  return `
+    ${SYSTEM_PROMPT_PREFIX}
+    ${npcPrompt}
+    ${contextPrompt}
+    ${opinionPrompt}
+    ${SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS}
+  `;
+}
+
+export function initChat(
+  chat: ChatState,
+  character: string,
+  fromCharacterName: string = PLAYER_CONFIG.name
+) {
   chat.history[character] = [
     {
       role: 'system',
-      content: `
-        ${SYSTEM_PROMPT_PREFIX}
-        ${npcPrompt}
-        ${contextPrompt}
-        ${opinionPrompt}
-        ${SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS}
-      `,
+      content: getSystemPrompt(chat, character, fromCharacterName),
     },
   ];
 }
@@ -158,12 +157,11 @@ async function summarizeChat(chat: ChatState, character: string) {
   const messages = chat.history[character]
     .filter((c) => c.role !== 'system')
     .map((c) => c.character + ': ' + c.content || '')
-    .map((c) => c.replace(/<memory>[\s\S]*?<\/memory>/g, '').trim())
     .join(' \n');
   const promptPrefix = `
-    Write a 10 or 12 sentences summary of the following conversation. 
+    Write a 10 or 12 sentences summary of the following story. Don't analyze, just tell the story in a shorter way.
     Focus on important and memorable elements. Return only the summary, no other text.
-    Conversation: 
+    Story: 
   `;
   const memory = await ollama.chat({
     model: LLM_MODEL,
@@ -176,29 +174,34 @@ export async function sendMessage(
   gs: State,
   characterKey: string,
   message: string,
-  action: string,
   onStream: ((chunk: string) => void) | null,
   fromCharacterName: string = PLAYER_CONFIG.name
 ) {
   const startTime = performance.now();
   console.log(`[sendMessage] Starting message to ${characterKey}`);
 
-  const messageWithSender = message ? `${fromCharacterName} tells you this: ${message}` : '';
-  const actionWithSender = action ? `${fromCharacterName} does this: ${action}` : '';
-  const memoryPrompt = await queryNpcMemory(
+  // reset initial system prompt
+  gs.chat.history[characterKey][0].content = getSystemPrompt(
+    gs.chat,
     characterKey,
-    messageWithSender + ' ' + actionWithSender
+    fromCharacterName
   );
+
+  const messageWithSender = message ? `${fromCharacterName} says and does this: ${message}` : '';
+  let memoryPrompt = '';
+  try {
+    memoryPrompt = await queryNpcMemory(characterKey, messageWithSender);
+  } catch (error) {
+    console.error('Failed to query NPC memory:', error);
+    memoryPrompt = ''; // Fallback to empty string if memory query fails
+  }
   const messageObject: DecodedMessage = {
     role: 'user',
-    content: `<memory>${memoryPrompt}.</memory> ${messageWithSender}. ${actionWithSender}`,
+    content: `${memoryPrompt} ${messageWithSender}`,
     character: fromCharacterName,
   };
 
-  messageObject.speech = message;
-  messageObject.actions = action;
-
-  gs.chat.history[characterKey].push(messageObject);
+  messageObject.displayMessage = message;
 
   // Use streaming API
   const streamStartTime = performance.now();
@@ -206,14 +209,24 @@ export async function sendMessage(
     `[sendMessage] memory request in ${(streamStartTime - startTime).toFixed(2)}ms Starting stream request to LLM`
   );
 
+  gs.chat.history[characterKey].push(messageObject);
+
   const stream = await ollama.chat({
     model: LLM_MODEL,
     messages: [
       ...gs.chat.history[characterKey].filter((c) => c.role === 'system'),
-      ...gs.chat.history[characterKey].filter((c) => c.role !== 'system').slice(-6),
+      ...gs.chat.history[characterKey].filter((c) => c.role !== 'system').slice(-4),
     ],
     stream: true,
   });
+
+  gs.chat.history[characterKey][gs.chat.history[characterKey].length - 1].content =
+    messageObject.content.replace(memoryPrompt, '');
+
+  const streamReadyTime = performance.now();
+  console.log(
+    `[sendMessage] Stream starting in ${(streamReadyTime - streamStartTime).toFixed(2)}ms`
+  );
 
   let fullResponse = '';
   for await (const chunk of stream) {
@@ -226,23 +239,25 @@ export async function sendMessage(
     `[sendMessage] Stream completed in ${(streamEndTime - streamStartTime).toFixed(2)}ms`
   );
 
-  fullResponse = extractJsonFromMessage(fullResponse);
-
   // add NPC response to chat history
   const characterName = gs.sim.characters.find((c) => c.key === characterKey)?.name;
   gs.chat.history[characterKey].push({
     role: 'assistant',
     content: fullResponse,
     character: characterName,
-    ...parseMessage(fullResponse),
   });
 
   // every 10 messages, add a summary to the chat history
   if ((gs.chat.history[characterKey].length - 1) % 10 <= 1) {
     summarizeChat(gs.chat, characterKey).then((summary) => {
+      const messageCount = gs.chat.history[characterKey].length;
       gs.chat.history[characterKey].push({
         role: 'system',
-        content: 'Summary ealier parts of the conversation: ' + summary,
+        content: `[Summary of messages ${messageCount - 10} to ${messageCount}]
+        Key points from this segment of the conversation:
+        ${summary}
+
+        This summary helps maintain context of earlier parts of the conversation.`,
       });
     });
   }
@@ -261,33 +276,6 @@ export async function findActionRequestInMessage(
   const messageWithCharacters = `${fromCharacterName} tells ${characterName} this: ${message}`;
   const action = await getActionFromText(messageWithCharacters);
   return action;
-}
-
-function parseMessage(message: string): MessageExpansion {
-  let parsed = {};
-  try {
-    parsed = JSON.parse(message);
-  } catch (e) {
-    return {
-      speech: message,
-    };
-  }
-  return parsed;
-}
-
-function extractJsonFromMessage(message: string): string {
-  const startJson = message.indexOf('{');
-  if (startJson !== -1) {
-    const json = message
-      .substring(startJson)
-      .trim()
-      .replace(/, }/, '}')
-      .replace(/""/g, '"')
-      .replace(/^```json\n/, '')
-      .replace(/\n```$/, '');
-    return json.endsWith('}') ? json : json + '}';
-  }
-  return '';
 }
 
 export async function checkProposedAction(gs: State, npcKey: string, message: string) {
@@ -345,12 +333,9 @@ export async function reactToContextChange(gs: State, characterKey: string, newC
     messages: [...gs.chat.history[characterKey], message],
   });
 
-  const reactionJson = extractJsonFromMessage(reaction.message.content);
-
   gs.chat.history[characterKey].push({
     role: 'assistant',
-    content: reactionJson,
+    content: reaction.message.content,
     character: characterName,
-    ...parseMessage(reactionJson),
   });
 }

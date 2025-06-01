@@ -42,20 +42,7 @@
     // Clear the input and focus it
     target.value = '';
 
-    let messageInStars = '';
-    let messageOutsideStars = '';
-
-    // Split message into parts within and outside stars
-    const starMatch = message.match(/\*(.*?)\*/);
-    if (starMatch) {
-      messageInStars = starMatch[1];
-      messageOutsideStars = message.replace(/\*.*?\*/, '').trim();
-    } else {
-      messageInStars = '';
-      messageOutsideStars = message;
-    }
-
-    await sendMessage(gs, npcKey, messageOutsideStars, messageInStars, onStream);
+    await sendMessage(gs, npcKey, message, onStream);
     currentMessage = '';
     fullMessage = '';
     if (includesActionProposal) {
@@ -107,10 +94,7 @@
 
   function onStream(chunk: string) {
     fullMessage += chunk;
-    // this is trick to display text only after the speech JSON property is set in the response
-    if (fullMessage.includes(': "')) {
-      currentMessage += chunk;
-    }
+    currentMessage = fullMessage;
   }
 
   const names: Record<string, string> = {
@@ -131,14 +115,7 @@
     {#each gs.chat.history[npcKey]?.filter((m) => m.role !== 'system') as message}
       <div class="chat-bit">
         <strong>{names[message.role]}:</strong>
-        {#if message.speech}
-          <div>{message.speech}</div>
-        {/if}
-        {#if message.actions}
-          <div class="chat-bit-action">
-            {'<' + message.actions + '>'}
-          </div>
-        {/if}
+        <div>{message.displayMessage || message.content}</div>
       </div>
     {/each}
     {#if currentMessage}
