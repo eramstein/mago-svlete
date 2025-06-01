@@ -36,7 +36,7 @@ export async function listCollectionsWithContent() {
         count > 0
           ? await collection.get({
               limit,
-              offset: count - limit,
+              offset: Math.max(0, count - limit),
             })
           : null;
 

@@ -46,6 +46,28 @@ const startGame: () => Tool = () => {
   };
 };
 
+const startTrade: () => Tool = () => {
+  return {
+    type: 'function',
+    function: {
+      name: ActionType.StartTrade,
+      description: ACTIONS[ActionType.StartTrade].description,
+      parameters: {
+        type: 'object',
+        required: ['partner'],
+        properties: {
+          partner: {
+            type: 'string',
+            description:
+              'The person tarding cards with you, one of the characters present at the same place',
+            enum: gs.sim.characters.map((c) => c.name),
+          },
+        },
+      },
+    },
+  };
+};
+
 export function getTools(): Tool[] {
-  return [goTo, startGame].map((f) => f());
+  return [goTo, startGame, startTrade].map((f) => f());
 }

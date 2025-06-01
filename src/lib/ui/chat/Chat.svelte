@@ -6,7 +6,7 @@
   import { jointAction } from '@/lib/logic/sim/actions';
   import { ActionType } from '@/lib/config';
   import { initBattle } from '@/lib/logic';
-  import { uiState, UiView } from '@/lib/state/state-ui.svelte';
+  import { initTrade } from '@/lib/logic/sim/actions/trade';
 
   let { npcKey }: { npcKey: string } = $props();
 
@@ -34,17 +34,8 @@
       return;
     }
     const message = target.value;
-    if (includesActionProposal && message === 'battle') {
-      const opponentId = gs.sim.characters.findIndex((c) => c.key === npcKey);
-      initBattle(gs.sim.characters[opponentId].name, [
-        gs.sim.player.decks[0],
-        gs.sim.characters[opponentId].decks[0],
-      ]);
-      uiState.currentView = UiView.Battle;
-      return;
-    }
-    if (message === 'bye') {
-      endChat(gs.chat, npcKey);
+    const shortCircuited = handleShortcuts(message, includesActionProposal);
+    if (shortCircuited) {
       return;
     }
 
@@ -73,6 +64,27 @@
         proposedAction = response.action;
       }
     }
+  }
+
+  function handleShortcuts(message: string, includesActionProposal: boolean) {
+    if (includesActionProposal && message === 'battle') {
+      const opponentId = gs.sim.characters.findIndex((c) => c.key === npcKey);
+      initBattle(gs.sim.characters[opponentId].name, [
+        gs.sim.player.decks[0],
+        gs.sim.characters[opponentId].decks[0],
+      ]);
+      return true;
+    }
+    if (includesActionProposal && message === 'trade') {
+      const partnerId = gs.sim.characters.findIndex((c) => c.key === npcKey);
+      initTrade(gs, gs.sim.characters[partnerId]);
+      return true;
+    }
+    if (message === 'bye') {
+      endChat(gs.chat, npcKey);
+      return true;
+    }
+    return false;
   }
 
   async function executeAction() {

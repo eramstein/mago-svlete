@@ -24,6 +24,7 @@ export const initialSimState: SimState = {
     startDate: new Date(),
     ellapsedTime: 0,
   },
+  ongoingActivity: null,
   places: PLACES,
   characters: [
     {

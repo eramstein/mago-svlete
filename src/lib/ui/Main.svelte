@@ -6,15 +6,27 @@
   import Chat from './chat/Chat.svelte';
   import Actions from './Actions.svelte';
   import Collection from './collection/Collection.svelte';
+  import { ActionType } from '../config';
+  import Trade from './collection/Trade.svelte';
 
   function toggleCollection() {
     uiState.currentView =
       uiState.currentView === UiView.Collection ? UiView.Sim : UiView.Collection;
   }
+
+  $effect(() => {
+    if (gs.battle.turn) {
+      uiState.currentView = UiView.Battle;
+    } else if (gs.sim.ongoingActivity?.actionType === ActionType.StartTrade) {
+      uiState.currentView = UiView.Trade;
+    } else {
+      uiState.currentView = UiView.Sim;
+    }
+  });
 </script>
 
 <div class="main">
-  <button class="collection-toggle" on:click={toggleCollection}>
+  <button class="collection-toggle" onclick={toggleCollection}>
     {uiState.currentView === UiView.Collection ? 'Collection' : 'Collection'}
   </button>
   <div class="scene-container">
@@ -26,6 +38,9 @@
     {/if}
     {#if uiState.currentView === UiView.Collection}
       <Collection />
+    {/if}
+    {#if uiState.currentView === UiView.Trade}
+      <Trade />
     {/if}
     <div class="actions-container">
       <Actions />

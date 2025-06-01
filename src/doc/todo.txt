@@ -3,6 +3,7 @@ by storing these as memories in the vector DB it can create characters on the fl
 
 finer control on NPC memories with specific entry IDs:
 - deck lists
+- favorite cards
 - opinions about other NPCs (about the player might be more detailed and in the main system prompt?)
 
 problem: the typical semantic space of the simulation (nerdy games) is quite narrow,
@@ -11,7 +12,3 @@ RAG isn't easy to use in a performant way for these cases.
 
 handle passage of time
 
-add card collections to sim state
-
-problem: created memories include too much of previous memories since they are repeated in chat prompts
-they are also slightly too short

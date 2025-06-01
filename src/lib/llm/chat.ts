@@ -28,7 +28,6 @@ Return only ONE such object. Do not return multiple objects.
 IMPORTANT: All property values MUST be enclosed in double quotes. 
 Do not use single quotes or omit quotes.
 Don't forget the comma before "actions".
-Keep it relatively short, 5 to 12 sentences max.
 Example of correct format:
 {
   "speech": "Hello there!",
@@ -131,8 +130,8 @@ export function initChat(
 
 export async function endChat(chat: ChatState, character: string) {
   const summary = await summarizeChat(chat, character);
-  addNpcMemory(character, summary);
-  updateNpcOpinion(chat, character, summary);
+  await addNpcMemory(character, summary);
+  await updateNpcOpinion(chat, character, summary);
   delete chat.history[character];
   chat.chattingWith = '';
   resetContext(chat);
@@ -159,7 +158,7 @@ async function summarizeChat(chat: ChatState, character: string) {
   const messages = chat.history[character]
     .filter((c) => c.role !== 'system')
     .map((c) => c.character + ': ' + c.content || '')
-    .map((c) => c.replace(/<memory>.*<\/memory>/g, ''))
+    .map((c) => c.replace(/<memory>[\s\S]*?<\/memory>/g, '').trim())
     .join(' \n');
   const promptPrefix = `
     Write a 10 or 12 sentences summary of the following conversation. 

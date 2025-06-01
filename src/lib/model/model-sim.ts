@@ -1,11 +1,15 @@
+import type { ActionType } from '../config';
 import type { State } from './main';
-import type { CardTemplate } from './model-battle';
 
 export interface SimState {
   time: Time;
   places: Place[];
   characters: Character[];
   player: Character;
+  ongoingActivity: {
+    actionType: ActionType;
+    characters: Character[];
+  } | null;
 }
 
 export interface Time {

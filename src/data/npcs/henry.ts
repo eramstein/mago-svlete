@@ -30,5 +30,8 @@ export const NPC_HENRY: CharacterRole = {
       Henry's familty doesn't understand his passion for history, they think it's a waste of time.
       They also want him to get a job and become independent, but he's not ready to do that yet.
     `,
+    `        
+      Henry once lost his collection of cards when he was 12 years old, he was devastated and cried for hours.
+    `,
   ],
 };

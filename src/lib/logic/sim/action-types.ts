@@ -1,6 +1,5 @@
 import { ActionType } from '@/lib/config';
-import { moveTool } from './actions/move';
-import { startGameTool } from './actions/game';
+import { startGameTool, startTradeTool, moveTool } from '@/lib/logic/sim/actions/index';
 import type { ActionTypeDefinition } from '@/lib/model';
 
 export const ACTIONS: Record<string, ActionTypeDefinition> = {
@@ -13,6 +12,11 @@ export const ACTIONS: Record<string, ActionTypeDefinition> = {
     fn: startGameTool,
     duration: 10,
     description: 'Start a game of Hordes cards.',
+  },
+  [ActionType.StartTrade]: {
+    fn: startTradeTool,
+    duration: 10,
+    description: 'Start a trade with a character.',
   },
   [ActionType.None]: {
     fn: () => {},

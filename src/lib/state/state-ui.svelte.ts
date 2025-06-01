@@ -4,6 +4,7 @@ export enum UiView {
   Battle,
   Sim,
   Collection,
+  Trade,
 }
 
 export const uiState: UiState = $state({
