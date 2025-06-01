@@ -34,6 +34,18 @@ export const PLACES: Place[] = [
     ],
   },
   {
+    name: 'Le Chat Noir',
+    description:
+      'A fancy French restaurant, with a bar and a dining room. Offers a wide range of French dishes, from classic to modern, and all sorts of wines.',
+    zones: [
+      {
+        name: 'salle',
+        image: 'le_chat_noir_salle',
+        description: 'A beautifully decorated dining room, luxurious but cosy.',
+      },
+    ],
+  },
+  {
     name: 'University',
     description:
       'An old university specialized in cognitive sciences studies. Beautiful buildings from the early 1900s with a germanic style architecture.',

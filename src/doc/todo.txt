@@ -12,9 +12,9 @@ RAG isn't easy to use in a performant way for these cases.
 
 handle passage of time
 
-the place context is not updated in the system prompted after a goTo action
-
 make system prompt dynamic, there is no reason to keep it fixed as we re-pass the whole chat history every call anyways
 - e.g. randomize personality traits that get selected every time, to avoid caricatural characters (pb with relevance in the context though)
 
 group chat
+
+phone calls, emails?

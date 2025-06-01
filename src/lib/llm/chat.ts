@@ -11,15 +11,12 @@ import { addContextFromLocation, getFullContextString, resetContext } from './co
 import { gs } from '../state/main.svelte';
 import { queryWorldsMemory } from './world';
 
-const SYSTEM_PROMPT_PREFIX = `This is a collaborative writing with the user. Make short answers (2-3 sentences). You are writing a character named`;
+const SYSTEM_PROMPT_PREFIX = `This is a collaborative writing with the user. 
+Make short answers (2-3 sentences).
+Try to move the story forward, don't repeat or run into cycles.
+Don't make your character too caricatural, their personality traits don't have to always be emphasized.
+You are writing a character named`;
 const SYSTEM_PROMPT_PREFIX_2 = `The user is writing a character named`;
-// const SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS = `
-// Return a JSON output describing what your character says and what actions he takes in that interaction. Format:
-// {
-//   "speech": "<what your character says>",
-//   "actions": "<what your character does>"
-// }
-// `;
 const SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS =
   'For every user message, replay with what your character says and does.';
 const CONTEXT_PREFIX = `
@@ -159,7 +156,8 @@ async function summarizeChat(chat: ChatState, character: string) {
     .map((c) => c.character + ': ' + c.content || '')
     .join(' \n');
   const promptPrefix = `
-    Write a 10 or 12 sentences summary of the following story. Don't analyze, just tell the story in a shorter way.
+    Write a 10 or 12 sentences summary of the following story. 
+    Write it from the perspective of the character ${character}. It is a memory they are forming.
     Focus on important and memorable elements. Return only the summary, no other text.
     Story: 
   `;
