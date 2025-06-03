@@ -16,7 +16,9 @@ export type CharacterRole = {
   name: string;
   systemPrompt: string;
   initialMemories: string[];
+  personalityTraits: string[]; // these are traits that we don't want injected in every prompt
   opinionOfPlayer: string;
+  cardsValuation: Record<string, number>; // if a character has specific options of a card; how much the character values a card, from 0 to 100.
 };
 
 export type MessageExpansion = {

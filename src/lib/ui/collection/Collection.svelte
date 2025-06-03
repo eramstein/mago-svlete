@@ -27,27 +27,29 @@
 </script>
 
 <div class="collection">
-  <div class="search">
-    <input type="text" placeholder="Search cards..." bind:value={searchQuery} />
-  </div>
+  <div class="controls">
+    <div class="search">
+      <input type="text" placeholder="Search cards..." bind:value={searchQuery} />
+    </div>
 
-  <div class="realm-tabs">
-    <button
-      class="tab"
-      class:active={selectedRealm === null}
-      onclick={() => (selectedRealm = null)}
-    >
-      All
-    </button>
-    {#each Object.values(Realm) as realm}
+    <div class="realm-tabs">
       <button
         class="tab"
-        class:active={selectedRealm === realm}
-        onclick={() => (selectedRealm = realm)}
+        class:active={selectedRealm === null}
+        onclick={() => (selectedRealm = null)}
       >
-        {realm.charAt(0).toUpperCase() + realm.slice(1)}
+        All
       </button>
-    {/each}
+      {#each Object.values(Realm) as realm}
+        <button
+          class="tab"
+          class:active={selectedRealm === realm}
+          onclick={() => (selectedRealm = realm)}
+        >
+          {realm.charAt(0).toUpperCase() + realm.slice(1)}
+        </button>
+      {/each}
+    </div>
   </div>
 
   <div class="cards-grid">
@@ -74,19 +76,25 @@
 
 <style>
   .collection {
-    padding: 1rem;
-    height: 100%;
+    padding: 50px 1rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+
   .search {
-    width: 100%;
+    flex-shrink: 0;
   }
 
   .search input {
-    width: 100%;
+    width: 300px;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;

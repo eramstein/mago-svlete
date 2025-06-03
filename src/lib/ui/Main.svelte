@@ -14,6 +14,11 @@
       uiState.currentView === UiView.Collection ? UiView.Sim : UiView.Collection;
   }
 
+  function resetToMainSimView() {
+    uiState.currentView = UiView.Sim;
+    gs.sim.ongoingActivity = null;
+  }
+
   $effect(() => {
     if (gs.battle.turn) {
       uiState.currentView = UiView.Battle;
@@ -26,9 +31,10 @@
 </script>
 
 <div class="main">
-  <button class="collection-toggle" onclick={toggleCollection}>
-    {uiState.currentView === UiView.Collection ? 'Collection' : 'Collection'}
-  </button>
+  <div class="view-toggle-container">
+    <button class="view-toggle collection-toggle" onclick={toggleCollection}> Collection </button>
+    <button class="view-toggle sim-toggle" onclick={resetToMainSimView}> Sim </button>
+  </div>
   <div class="scene-container">
     {#if uiState.currentView === UiView.Battle}
       <Battle />
@@ -73,11 +79,15 @@
     bottom: 20px;
     right: 20%;
   }
-  .collection-toggle {
+  .view-toggle-container {
     position: absolute;
-    top: 50px;
+    top: 10px;
     left: 10px;
     z-index: 100;
+    display: flex;
+    gap: 10px;
+  }
+  .view-toggle {
     padding: 8px 16px;
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
@@ -85,6 +95,12 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
+  }
+  .sim-toggle {
+    right: 10px;
+  }
+  .collection-toggle {
+    right: 10px;
   }
   .collection-toggle:hover {
     background-color: rgba(0, 0, 0, 0.9);

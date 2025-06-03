@@ -1,6 +1,7 @@
 import { ActionType } from '@/lib/config';
 import { initChat } from '@/lib/llm';
 import type { State } from '@/lib/model/main';
+import type { Card } from '@/lib/model/model-battle';
 import type { Character } from '@/lib/model/model-sim';
 
 export function startTradeTool(
@@ -26,4 +27,27 @@ export function initTrade(gs: State, tradePartner: Character) {
     actionType: ActionType.StartTrade,
     characters: [gs.sim.player, tradePartner],
   };
+}
+
+export function tradeCards(
+  gs: State,
+  selectedPlayerCard: Card,
+  selectedNpcCard: Card,
+  npc: Character
+) {
+  if (!selectedPlayerCard || !selectedNpcCard || !npc) return;
+
+  // Remove cards from both collections
+  gs.sim.player.cardCollection[selectedPlayerCard.id]--;
+  if (npc.cardCollection[selectedNpcCard.id]) {
+    npc.cardCollection[selectedNpcCard.id]--;
+  }
+
+  // Add cards to opposite collections
+  gs.sim.player.cardCollection[selectedNpcCard.id] =
+    (gs.sim.player.cardCollection[selectedNpcCard.id] || 0) + 1;
+  if (npc.cardCollection) {
+    npc.cardCollection[selectedPlayerCard.id] =
+      (npc.cardCollection[selectedPlayerCard.id] || 0) + 1;
+  }
 }

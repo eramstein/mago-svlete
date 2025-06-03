@@ -45,7 +45,7 @@
     border: 1px solid #ccc;
     text-align: center;
     padding: 2px 20px;
-    top: 10px;
+    top: 60px;
     left: 10px;
   }
   .characters {

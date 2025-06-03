@@ -12,9 +12,10 @@ RAG isn't easy to use in a performant way for these cases.
 
 handle passage of time
 
-make system prompt dynamic, there is no reason to keep it fixed as we re-pass the whole chat history every call anyways
-- e.g. randomize personality traits that get selected every time, to avoid caricatural characters (pb with relevance in the context though)
+organize events, calendar? e.g. tournaments, game nights
 
 group chat
 
 phone calls, emails?
+
+improve trade acceptance prompt

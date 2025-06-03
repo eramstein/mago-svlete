@@ -1,15 +1,13 @@
 import ollama from 'ollama';
 import { NPCS } from '@/data/npcs';
-import type { ChatState, DecodedMessage, MessageExpansion } from '@/lib/model/model-llm';
-import { vectorDatabaseClient } from './vector-db';
+import type { ChatState, DecodedMessage } from '@/lib/model/model-llm';
 import { LLM_MODEL, LLM_MODEL_TOOLS } from './config';
 import { PLAYER_CONFIG } from '@/data/npcs/player';
 import { getActionFromText } from './action';
-import type { SimState } from '../model';
 import type { State } from '../model/main';
 import { addContextFromLocation, getFullContextString, resetContext } from './context';
 import { gs } from '../state/main.svelte';
-import { queryWorldsMemory } from './world';
+import { addNpcMemory, queryNpcMemory } from './npc-memory';
 
 const SYSTEM_PROMPT_PREFIX = `This is a collaborative writing with the user. 
 Make short answers (2-3 sentences).
@@ -22,59 +20,6 @@ const SYSTEM_PROMPT_OUTPUT_INSTRUCTIONS =
 const CONTEXT_PREFIX = `
   For context, this is what is happening around your character: 
 `;
-
-export async function initNpcMemory(sim: SimState) {
-  sim.characters.forEach(async (character) => {
-    const collection = await vectorDatabaseClient.getOrCreateCollection({
-      name: character.key,
-    });
-    await collection.upsert({
-      documents: NPCS[character.key].initialMemories,
-      ids: NPCS[character.key].initialMemories.map((_, i) => character.key + ' memory ' + i),
-    });
-  });
-  console.log('NPCs memory initalized');
-}
-
-async function queryNpcMemory(characterKey: string, message: string) {
-  // Query character's personal memories
-  const characterCollection = await vectorDatabaseClient.getOrCreateCollection({
-    name: characterKey,
-  });
-  const characterResults = await characterCollection.query({
-    queryTexts: message,
-    nResults: 1,
-  });
-  const characterMemoryDistance = characterResults.distances?.[0]?.[0] || 2;
-
-  const worldResults = await queryWorldsMemory(message);
-
-  let response = '';
-
-  if (characterResults.documents.length && characterMemoryDistance < 1.5) {
-    response += 'Personal memory: ' + characterResults.documents[0] + '. ';
-  }
-
-  if (worldResults) {
-    response += ' ' + worldResults + '. ';
-  }
-
-  console.log('queryNpcMemory', characterKey, message, response);
-  return response;
-}
-
-async function addNpcMemory(characterKey: string, message: string) {
-  const uid = Date.now().toString(36) + Math.random().toString(36).substr(2);
-  const collection = await vectorDatabaseClient.getOrCreateCollection({
-    name: characterKey,
-  });
-  console.log('addNpcMemory', characterKey, message);
-  collection.add({
-    ids: [uid],
-    metadatas: [{ type: 'c' }],
-    documents: [message],
-  });
-}
 
 export function chatWithNpc(chat: ChatState, character: string) {
   chat.chattingWith = character;
@@ -89,13 +34,21 @@ function getSystemPrompt(
   character: string,
   fromCharacterName: string = PLAYER_CONFIG.name
 ) {
+  // Get 2 random personality traits
+  const traits = NPCS[character].personalityTraits;
+  const randomTraits = traits
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2)
+    .join(' and ');
+
   const npcPrompt =
     NPCS[character].name +
     '. ' +
     SYSTEM_PROMPT_PREFIX_2 +
     fromCharacterName +
     '. ' +
-    NPCS[character].systemPrompt;
+    NPCS[character].systemPrompt +
+    `\n${NPCS[character].name} is ${randomTraits}.`;
 
   const opinionPrompt = `This is the opinion ${character} has of ${PLAYER_CONFIG.name}: ${chat.characterOpinions[character]}. `;
 
@@ -213,9 +166,15 @@ export async function sendMessage(
     model: LLM_MODEL,
     messages: [
       ...gs.chat.history[characterKey].filter((c) => c.role === 'system'),
-      ...gs.chat.history[characterKey].filter((c) => c.role !== 'system').slice(-4),
+      ...gs.chat.history[characterKey].filter((c) => c.role !== 'system').slice(-5),
     ],
     stream: true,
+    options: {
+      temperature: 0.7,
+      repeat_penalty: 1.1,
+      top_k: 40,
+      top_p: 0.9,
+    },
   });
 
   gs.chat.history[characterKey][gs.chat.history[characterKey].length - 1].content =
@@ -248,15 +207,19 @@ export async function sendMessage(
   // every 10 messages, add a summary to the chat history
   if ((gs.chat.history[characterKey].length - 1) % 10 <= 1) {
     summarizeChat(gs.chat, characterKey).then((summary) => {
-      const messageCount = gs.chat.history[characterKey].length;
-      gs.chat.history[characterKey].push({
-        role: 'system',
-        content: `[Summary of messages ${messageCount - 10} to ${messageCount}]
-        Key points from this segment of the conversation:
-        ${summary}
+      // Keep the first system prompt and remove all other system prompts
+      const firstSystemPrompt = gs.chat.history[characterKey].find((m) => m.role === 'system');
+      const nonSystemMessages = gs.chat.history[characterKey].filter((m) => m.role !== 'system');
 
-        This summary helps maintain context of earlier parts of the conversation.`,
-      });
+      // Reconstruct history with first system prompt, non-system messages, and new summary
+      gs.chat.history[characterKey] = [
+        ...(firstSystemPrompt ? [firstSystemPrompt] : []),
+        ...nonSystemMessages,
+        {
+          role: 'system',
+          content: `Summary of earlier parts of the conversation: ${summary}`,
+        },
+      ];
     });
   }
 

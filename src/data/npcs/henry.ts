@@ -12,26 +12,37 @@ export const NPC_HENRY: CharacterRole = {
     Henry has short red hair and lots of freckles. He dresses very casually.
     Henry is very geeky, being passionate about lots of things like games, books, movies, etc.
     Henry is not a good student and struggles to focus on his studies.
-    Henry is not very socially aware and tends to be very naive, and make blunders in conversations.
     Henry plays hordes for the social aspects of it, and loves cards with big flashy units and fun illustrations, even if they are not very competitive.
     `,
+  personalityTraits: [
+    'naive',
+    'funny',
+    'nice',
+    'social',
+    'friendly',
+    'kind',
+    'generous',
+    'loyal',
+    'naive',
+  ],
   initialMemories: [
     `        
-      Henry used to be in the same psychology class as Molly, but failed and changed to history.
-      He admires the fact that Molly is a good student and is very fond of her.
+      ACADEMIC_HISTORY: Henry used to be in the same psychology class as Molly, but failed and changed to history.
+      PERSONAL_ADMIRATION: He admires the fact that Molly is a good student and is very fond of her.
     `,
     `
-      Henry is a childhood friend of ${PLAYER_CONFIG.name}, they used to play together a lot when they were kids and remained good friends ever since.
+      FRIENDSHIP_HISTORY: Henry is a childhood friend of ${PLAYER_CONFIG.name}, they used to play together a lot when they were kids and remained good friends ever since.
     `,
     `
-      Henry never played a hordes tournament, he's afraid of losing and being laughed at.
+      GAMING_ANXIETY: Henry never played a hordes tournament, he's afraid of losing and being laughed at.
     `,
     `        
-      Henry's familty doesn't understand his passion for history, they think it's a waste of time.
-      They also want him to get a job and become independent, but he's not ready to do that yet.
+      FAMILY_PRESSURE: Henry's familty doesn't understand his passion for history, they think it's a waste of time.
+      LIFE_STAGE: They also want him to get a job and become independent, but he's not ready to do that yet.
     `,
     `        
-      Henry once lost his collection of cards when he was 12 years old, he was devastated and cried for hours.
+      CHILDHOOD_TRAUMA: Henry once lost his collection of cards when he was 12 years old, he was devastated and cried for hours.
     `,
   ],
+  cardsValuation: {},
 };

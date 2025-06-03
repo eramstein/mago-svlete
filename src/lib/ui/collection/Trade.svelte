@@ -4,6 +4,8 @@
   import { cards } from '@/data/cards';
   import type { Card } from '@lib/model/model-battle';
   import { Realm } from '@lib/config/enums-battle';
+  import { tradeCards } from '@/lib/logic/sim/actions/trade';
+  import { proposeTrade } from '@/lib/llm';
 
   let selectedPlayerCard: Card | null = $state(null);
   let selectedNpcCard: Card | null = $state(null);
@@ -32,21 +34,18 @@
     })
   );
 
-  function executeTrade() {
+  async function executeTrade() {
     if (!selectedPlayerCard || !selectedNpcCard || !npc) return;
 
-    // Remove cards from both collections
-    gs.sim.player.cardCollection[selectedPlayerCard.id]--;
-    if (npc.cardCollection[selectedNpcCard.id]) {
-      npc.cardCollection[selectedNpcCard.id]--;
-    }
+    const tradeResponse = await proposeTrade(
+      gs,
+      npc.key,
+      selectedPlayerCard.id,
+      selectedNpcCard.id
+    );
 
-    // Add cards to opposite collections
-    gs.sim.player.cardCollection[selectedNpcCard.id] =
-      (gs.sim.player.cardCollection[selectedNpcCard.id] || 0) + 1;
-    if (npc.cardCollection) {
-      npc.cardCollection[selectedPlayerCard.id] =
-        (npc.cardCollection[selectedPlayerCard.id] || 0) + 1;
+    if (tradeResponse.answer.includes('YES')) {
+      tradeCards(gs, selectedPlayerCard, selectedNpcCard, npc);
     }
 
     // Reset selections
@@ -56,27 +55,29 @@
 </script>
 
 <div class="trade">
-  <div class="search">
-    <input type="text" placeholder="Search cards..." bind:value={searchQuery} />
-  </div>
+  <div class="controls">
+    <div class="search">
+      <input type="text" placeholder="Search cards..." bind:value={searchQuery} />
+    </div>
 
-  <div class="realm-tabs">
-    <button
-      class="tab"
-      class:active={selectedRealm === null}
-      onclick={() => (selectedRealm = null)}
-    >
-      All
-    </button>
-    {#each Object.values(Realm) as realm}
+    <div class="realm-tabs">
       <button
         class="tab"
-        class:active={selectedRealm === realm}
-        onclick={() => (selectedRealm = realm)}
+        class:active={selectedRealm === null}
+        onclick={() => (selectedRealm = null)}
       >
-        {realm.charAt(0).toUpperCase() + realm.slice(1)}
+        All
       </button>
-    {/each}
+      {#each Object.values(Realm) as realm}
+        <button
+          class="tab"
+          class:active={selectedRealm === realm}
+          onclick={() => (selectedRealm = realm)}
+        >
+          {realm.charAt(0).toUpperCase() + realm.slice(1)}
+        </button>
+      {/each}
+    </div>
   </div>
 
   <div class="trade-container">
@@ -140,19 +141,25 @@
 
 <style>
   .trade {
-    padding: 1rem;
-    height: 100%;
+    padding: 50px 1rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+
   .search {
-    width: 100%;
+    flex-shrink: 0;
   }
 
   .search input {
-    width: 100%;
+    width: 300px;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -176,6 +183,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    color: white;
   }
 
   .collection-section h2 {
