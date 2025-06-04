@@ -3,14 +3,14 @@ import { initWorldMemory } from '@/lib/llm/world';
 import { gs } from '@/lib/state';
 
 export const consoleCommands = {
-  loadvectors: () => {
+  load: () => {
     initNpcMemory(gs.sim);
     initWorldMemory();
   },
-  resetvectors: () => {
+  reset: () => {
     resetVectorDatabase();
   },
-  listcollections: () => {
+  list: () => {
     listCollectionsWithContent();
   },
   l: () => {

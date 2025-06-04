@@ -1,11 +1,6 @@
 explore how LLM makes up stuff when it doesn't know an aspect of a character
 by storing these as memories in the vector DB it can create characters on the fly
 
-finer control on NPC memories with specific entry IDs:
-- deck lists
-- favorite cards
-- opinions about other NPCs (about the player might be more detailed and in the main system prompt?)
-
 problem: the typical semantic space of the simulation (nerdy games) is quite narrow,
 and the LLM confuses things like MTG and Warhammer (Skaven deck?)
 RAG isn't easy to use in a performant way for these cases.
@@ -19,3 +14,19 @@ group chat
 phone calls, emails?
 
 improve trade acceptance prompt
+
+--------------------------------------------
+better memory query
+
+use hybrid memory scoring (matadata match + metadata.important + chromadb distance)
+
+function scoreMemory(memory, cosineDistance, currentTime) {
+  const recencyWeight = 1 - (currentTime - new Date(memory.metadata.timestamp)) / (7 * 24 * 60 * 60 * 1000); // Decay over 7 days
+  const contextMatch = memory.metadata.game_context === "Hordes" ? 0.3 : 0; // Boost for Hordes
+  return cosineDistance - (0.4 * recencyWeight + 0.3 * contextMatch);
+}
+
+--------
+
+Add sentiment or trait_expressed in memories metadata. 
+Then retreive relevant memories and see how the NPCs behaved in similar past time, and add it to system prompt.

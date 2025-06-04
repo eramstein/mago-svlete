@@ -1,10 +1,10 @@
-import ollama from 'ollama';
 import type { State } from '../model/main';
 import { LLM_MODEL_TOOLS } from './config';
 import { PLAYER_CONFIG } from '@/data/npcs/player';
 import { queryNpcMemory } from './npc-memory';
 import { cards } from '@/data/cards';
 import { NPCS } from '@/data/npcs';
+import { llmService } from './llm-service';
 
 export async function proposeTrade(gs: State, npcKey: string, card1: string, card2: string) {
   const card1Name = cards[card1].name;
@@ -53,14 +53,15 @@ export async function proposeTrade(gs: State, npcKey: string, card1: string, car
       What is your response? Start with YES or NO followed by what you would say.
     `,
   };
-  const response = await ollama.chat({
+  const response = await llmService.chat({
     model: LLM_MODEL_TOOLS,
     messages: [systemPrompt, question],
+    stream: false,
     options: {
       temperature: 0.5, // Lower temperature for more deterministic responses
     },
   });
-  const fullResponse = response.message.content.trim();
+  const fullResponse = llmService.getMessage(response).trim();
   gs.chat.history[npcKey].push({
     role: 'assistant',
     content: fullResponse,

@@ -1,5 +1,6 @@
 import type { Place } from '@/lib/model/model-sim';
 import { PLAYER_CONFIG } from '../npcs/player';
+import { NPC_EMMA } from '../npcs/emma';
 
 export const PLACES: Place[] = [
   {
@@ -42,6 +43,18 @@ export const PLACES: Place[] = [
         name: 'salle',
         image: 'le_chat_noir_salle',
         description: 'A beautifully decorated dining room, luxurious but cosy.',
+      },
+    ],
+  },
+  {
+    name: `${NPC_EMMA.name}'s home`,
+    description: 'A nice appartment in the city center.',
+    zones: [
+      {
+        name: 'living room',
+        image: 'living_room_fancy',
+        description:
+          'A beautiful living room, with a couch, a table and a TV, decorated with style and taste.',
       },
     ],
   },

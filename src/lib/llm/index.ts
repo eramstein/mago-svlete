@@ -5,3 +5,4 @@ export * from './tools';
 export * from './action';
 export * from './trade';
 export * from './npc-memory';
+export * from './tool-memory';

@@ -29,3 +29,17 @@ export type MessageExpansion = {
 export type DecodedMessage = Message & MessageExpansion;
 
 export type ChatHistory = DecodedMessage[];
+
+export type Memory = {
+  summary: string;
+  metadata: {
+    time: number;
+    place: string;
+    memory_type: string;
+    interaction_type?: string;
+    relationship_status?: string;
+    sentiment?: string;
+    trait_expressed?: string;
+    memory_importance?: string;
+  };
+};

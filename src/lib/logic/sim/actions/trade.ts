@@ -4,7 +4,7 @@ import type { State } from '@/lib/model/main';
 import type { Card } from '@/lib/model/model-battle';
 import type { Character } from '@/lib/model/model-sim';
 
-export function startTradeTool(
+export async function startTradeTool(
   gs: State,
   character: Character,
   param: {
@@ -15,7 +15,7 @@ export function startTradeTool(
   if (tradePartner) {
     initTrade(gs, tradePartner);
     if (!gs.chat.history[tradePartner.key]) {
-      initChat(gs.chat, tradePartner.key);
+      await initChat(gs.chat, tradePartner.key);
     }
   } else {
     console.log('No tradePartner found', param);

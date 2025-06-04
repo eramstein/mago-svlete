@@ -1,6 +1,6 @@
 import { NPCS } from '@/data/npcs';
 import { vectorDatabaseClient } from './vector-db';
-import type { SimState } from '../model';
+import type { Memory, SimState } from '../model';
 import { queryWorldsMemory } from './world';
 
 export async function initNpcMemory(sim: SimState) {
@@ -32,7 +32,7 @@ export async function queryNpcMemory(characterKey: string, message: string) {
   let response = '';
 
   if (characterResults.documents.length && characterMemoryDistance < 1.5) {
-    response += 'Personal memory: ' + characterResults.documents[0] + '. ';
+    response += characterResults.documents[0];
   }
 
   if (worldResults) {
@@ -43,15 +43,15 @@ export async function queryNpcMemory(characterKey: string, message: string) {
   return response;
 }
 
-export async function addNpcMemory(characterKey: string, message: string) {
+export async function addNpcMemory(characterKey: string, memory: Memory) {
   const uid = Date.now().toString(36) + Math.random().toString(36).substr(2);
   const collection = await vectorDatabaseClient.getOrCreateCollection({
     name: characterKey,
   });
-  console.log('addNpcMemory', characterKey, message);
+  console.log('addNpcMemory', characterKey, memory);
   collection.add({
     ids: [uid],
-    metadatas: [{ type: 'c' }],
-    documents: [message],
+    metadatas: [memory.metadata],
+    documents: [memory.summary],
   });
 }

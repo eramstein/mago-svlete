@@ -14,17 +14,7 @@ export const NPC_HENRY: CharacterRole = {
     Henry is not a good student and struggles to focus on his studies.
     Henry plays hordes for the social aspects of it, and loves cards with big flashy units and fun illustrations, even if they are not very competitive.
     `,
-  personalityTraits: [
-    'naive',
-    'funny',
-    'nice',
-    'social',
-    'friendly',
-    'kind',
-    'generous',
-    'loyal',
-    'naive',
-  ],
+  personalityTraits: ['naive', 'funny', 'nice', 'social', 'friendly', 'kind', 'generous', 'loyal'],
   initialMemories: [
     `        
       ACADEMIC_HISTORY: Henry used to be in the same psychology class as Molly, but failed and changed to history.

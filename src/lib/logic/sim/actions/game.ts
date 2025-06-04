@@ -3,7 +3,7 @@ import type { State } from '@/lib/model/main';
 import { initBattle } from '@/lib/logic/battle/battle';
 import { initChat } from '@/lib/llm/chat';
 
-export function startGameTool(
+export async function startGameTool(
   gs: State,
   character: Character,
   param: {
@@ -14,7 +14,7 @@ export function startGameTool(
   if (opponent) {
     initBattle(opponent.name, [gs.sim.player.decks[0], opponent.decks[0]]);
     if (!gs.chat.history[opponent.key]) {
-      initChat(gs.chat, opponent.key);
+      await initChat(gs.chat, opponent.key);
     }
   } else {
     console.log('No opponent found', param);

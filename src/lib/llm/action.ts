@@ -1,8 +1,9 @@
-import ollama, { type ToolCall } from 'ollama';
+import { type ToolCall } from 'ollama';
 import { LLM_MODEL_TOOLS } from './config';
 import { getTools } from './tools';
 import { ActionType } from '../config';
 import { queryWorldsMemory } from './world';
+import { llmService } from './llm-service';
 
 async function getToolsFromText(message: string) {
   const memoryPrompt = await queryWorldsMemory(message);
@@ -15,7 +16,7 @@ async function getToolsFromText(message: string) {
     role: 'user',
     content: `This is the key information to select the tool, give it priority: ${message}. ${memoryPrompt}`,
   };
-  const response = await ollama.chat({
+  const response = await llmService.chat({
     model: LLM_MODEL_TOOLS,
     messages: [systemMessage, query],
     tools: getTools(),
@@ -32,7 +33,8 @@ export async function getActionFromText(actionText: string): Promise<{
   args: Record<string, any>;
 }> {
   const llmResponse = await getToolsFromText(actionText);
-  const toolCalls = llmResponse.message.tool_calls;
+  const toolCalls = llmService.getTools(llmResponse);
+  console.log('getActionFromText toolCalls', toolCalls);
   if (toolCalls === undefined || toolCalls.length === 0) {
     console.log('No tool found');
     return {
@@ -42,7 +44,7 @@ export async function getActionFromText(actionText: string): Promise<{
   }
   const tool = (toolCalls as ToolCall[])[0];
   const actionType = tool.function.name as ActionType;
-  const args = tool.function.arguments;
+  const args = llmService.getToolArguments(tool.function.arguments);
   return {
     actionType,
     args,

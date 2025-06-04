@@ -68,7 +68,7 @@
       return true;
     }
     if (message === 'bye') {
-      endChat(gs.chat, npcKey);
+      endChat(gs, npcKey);
       return true;
     }
     return false;
